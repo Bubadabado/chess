@@ -13,26 +13,39 @@ public class ChessPosition {
     private int row;
     private int col;
 
-    public ChessPosition(int row, int col) {
-        this.row = row;
-        this.col = col;
+    public ChessPosition(int row, int col, boolean zeroIndexed) {
+        this.row = (!zeroIndexed) ? row : ChessBoard.BOARD_SIZE - row;
+        this.col = (!zeroIndexed) ? col : col + 1;
     }
+    public ChessPosition(int row, int col) {
+        this(row, col, false);
+    }
+
 
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return this.row;
+        return row;
     }
 
     /**
      * @return which column this position is in
-     * 1 codes for the left row
+     * 1 codes for the left column
      */
     public int getColumn() {
-        return this.col;
+        return col;
     }
+
+    /**
+     * @return a row converted to a properly oriented zero indexed row
+     */
+    public int getRowConverted() { return ChessBoard.BOARD_SIZE - row; }
+    /**
+     * @return a properly zero indexed column
+     */
+    public int getColConverted() { return col - 1; }
 
     @Override
     public boolean equals(Object o) {

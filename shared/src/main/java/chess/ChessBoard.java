@@ -8,11 +8,12 @@ package chess;
  */
 public class ChessBoard {
 
+    public static final int BOARD_SIZE = 8;
     private ChessPiece[][] board;
 
     public ChessBoard() {
-        this.board = new ChessPiece[8][8];
-        this.resetBoard();
+        this.board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+//        this.resetBoard();
     }
 
     /**
@@ -22,7 +23,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        this.board[position.getRow()][position.getColumn()] = piece;
+        board[position.getRowConverted()][position.getColConverted()] = new ChessPiece(piece);
     }
 
     /**
@@ -33,7 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return this.board[position.getRow()][position.getColumn()];
+        return board[position.getRowConverted()][position.getColConverted()];
     }
 
     /**
