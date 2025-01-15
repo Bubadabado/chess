@@ -1,5 +1,12 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.lang.Iterable;
+
+import static java.util.Arrays.asList;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,12 +15,16 @@ package chess;
  */
 public class ChessBoard {
 
+    private static final ChessPiece.PieceType[] BACK_ROW_ORDER = {
+        ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP,
+        ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING,
+        ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK
+    };
     public static final int BOARD_SIZE = 8;
     private ChessPiece[][] board;
 
     public ChessBoard() {
         this.board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
-//        this.resetBoard();
     }
 
     /**
@@ -23,7 +34,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRowConverted()][position.getColConverted()] = new ChessPiece(piece);
+        board[position.getRowConverted()][position.getColConverted()] = piece;//new ChessPiece(piece);
     }
 
     /**
@@ -42,6 +53,46 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        addBackRow(0, ChessGame.TeamColor.BLACK);
+        addPawnRow(1, ChessGame.TeamColor.BLACK);
+        addPawnRow(BOARD_SIZE - 2, ChessGame.TeamColor.WHITE);
+        addBackRow(BOARD_SIZE - 1, ChessGame.TeamColor.WHITE);
+    }
+
+    /**
+     * Adds a row of pawns
+     * @param row
+     * @param color
+     */
+    private void addPawnRow(int row, ChessGame.TeamColor color) {
+        for(int col = 0; col < BOARD_SIZE; col++) {
+            addPiece(new ChessPosition(row, col, true), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+        }
+    }
+
+    /**
+     * Adds a back row
+     * @param row
+     * @param color
+     */
+    private void addBackRow(int row, ChessGame.TeamColor color) {
+        BiConsumer<Integer, ChessPiece.PieceType> addBackRowPiece = (col, type) ->
+                addPiece(new ChessPosition(row, col, true), new ChessPiece(color, type));
+        int[] col = {0}; //used like a pointer to allow index incrementing within lambda function
+        asList(BACK_ROW_ORDER).forEach(piece -> addBackRowPiece.accept(col[0]++, piece));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
     }
 }
