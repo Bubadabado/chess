@@ -1,14 +1,7 @@
 package chess;
 
-import javax.swing.text.Position;
 import java.util.*;
-import java.lang.Math;
-
-import java.io.*;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Represents a single chess piece
@@ -88,23 +81,21 @@ public class ChessPiece {
     }
 
     //oob checking
-    private int outOfBoundsFix(int val) {
-        return Math.clamp(val, 0, ChessBoard.BOARD_SIZE - 1);
-    }
     private boolean isOutOfBounds(ChessPosition pos) {
         return pos.getRowConverted() < 0 || pos.getRowConverted() >= ChessBoard.BOARD_SIZE || pos.getColConverted() < 0 || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
     }
 
     /*Individual Piece moves*/
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        int row_begin = outOfBoundsFix(myPosition.getRowConverted() - 1);
-        int row_end   = outOfBoundsFix(myPosition.getRowConverted() + 1);
-        int col_begin = outOfBoundsFix(myPosition.getColConverted() - 1);
-        int col_end   = outOfBoundsFix(myPosition.getColConverted() + 1);
+        int row_begin = myPosition.getRowConverted() - 1;
+        int row_end   = myPosition.getRowConverted() + 1;
+        int col_begin = myPosition.getColConverted() - 1;
+        int col_end   = myPosition.getColConverted() + 1;
         Collection<ChessMove> moves = new ArrayList<>();
         for(var i = row_begin; i <= row_end; i++) {
             for (var j = col_begin; j <= col_end; j++) {
                 var pos = new ChessPosition(i, j, true);
+                if(isOutOfBounds(pos)) { continue; }
                 var target = board.getPiece(pos);
                 if (validMove(target) || validAttack(target)) {
                     moves.add(new ChessMove(myPosition, pos));
@@ -117,53 +108,50 @@ public class ChessPiece {
         throw new RuntimeException("Not implemented");
     }
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        BiConsumer<Integer, Integer> addMove = (rowOff, colOff) ->
-                moves.addAll(bishopMovesHelper(board, myPosition, myPosition,
-                new ChessPosition(myPosition.getRowConverted() - rowOff, myPosition.getColConverted() - colOff, true)));
-        addMove.accept(-1, -1);
-        addMove.accept(-1, 1);
-        addMove.accept(1, 1);
-        addMove.accept(1, -1);
-        return moves;
-    }
-    private Collection<ChessMove> bishopMovesHelper(ChessBoard board, ChessPosition startPosition, ChessPosition previousPosition, ChessPosition currentPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        if(!isOutOfBounds(currentPosition)) {
-            var target = board.getPiece(currentPosition);
-            if (validAttack(target)) {
-                moves.add(new ChessMove(startPosition, currentPosition));
-            } else if (validMove(target)) {
-                var newPosition = new ChessPosition(currentPosition.getRowConverted() - previousPosition.getRowConverted(),
-                        currentPosition.getColConverted() - previousPosition.getColConverted(), true); //offset new position
-                moves.addAll(bishopMovesHelper(board, startPosition, currentPosition, newPosition));
-            }
-        }
-        return moves;
+        List<int[]> offsets = Arrays.asList(
+                new int[]{1, 1},
+                new int[]{1, -1},
+                new int[]{-1, 1},
+                new int[]{-1, -1}
+        );
+        return createMoveList(board, myPosition, offsets);
     }
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        List<int[]> offsets = Arrays.asList(
+                new int[]{0, 1},
+                new int[]{0, -1},
+                new int[]{1, 0},
+                new int[]{-1, 0}
+        );
+        return createMoveList(board, myPosition, offsets);
+    }
+
+    /**
+     * Creates a list of moves valid move sgiven a list of offset tuples
+     * @param board game board
+     * @param myPosition start position
+     * @param offsets list of offset tuples acting like vectors to crawl the board
+     * @return a list of moves
+     */
+    private Collection<ChessMove> createMoveList(ChessBoard board, ChessPosition myPosition, List<int[]> offsets) {
         BiFunction<Integer, Integer, Collection<ChessPosition>> checkPosition = (roff, coff) ->
                 incrementalPositionCheck(board, myPosition, roff, coff);
-        //find the available positions to move to
-        List<ChessPosition> positionList = Stream.of(
-                checkPosition.apply(0, 1),
-                checkPosition.apply(0, -1),
-                checkPosition.apply(1, 0),
-                checkPosition.apply(-1, 0))
-                    .flatMap(Collection::stream).collect(Collectors.toList());
+        List<ChessPosition> positionList = offsets.stream()
+                .map(offset -> checkPosition.apply(offset[0], offset[1]))
+                .flatMap(Collection::stream).toList();
         return getMovesFromPositions(myPosition, positionList); //convert positions to moves
     }
 
     /**
-     * Recursively checks the board at positions incremented by respective row and column offsets
-     * @param board
-     * @param myPosition
-     * @param roff
-     * @param coff
-     * @return
+     * Recursively checks the board at positions incremented by respective row and column offsets; used for pieces with 'infinite' movement
+     * @param board game board
+     * @param myPosition current position
+     * @param roff row offset
+     * @param coff column offset
+     * @return a collection of positions
      */
     private Collection<ChessPosition> incrementalPositionCheck(ChessBoard board, ChessPosition myPosition, int roff, int coff) {
         int row = myPosition.getRowConverted() + roff;
@@ -179,6 +167,12 @@ public class ChessPiece {
         return positions;
     }
 
+    /**
+     * creates a collection of moves given a collection of positions
+     * @param start position
+     * @param positions - a list of all valid move positions
+     * @return moves
+     */
     private Collection<ChessMove> getMovesFromPositions(ChessPosition start, Collection<ChessPosition> positions) {
         Collection<ChessMove> moves = new ArrayList<>();
         positions.forEach((pos) -> moves.add(new ChessMove(start, pos)));
@@ -188,8 +182,8 @@ public class ChessPiece {
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         //TODO: dependant on team
-        int i = outOfBoundsFix(myPosition.getRowConverted() - 1);
-        int j = outOfBoundsFix(myPosition.getColConverted() - 1);
+        int i = myPosition.getRowConverted() - 1;
+        int j = myPosition.getColConverted() - 1;
         var pos = new ChessPosition(i, j, true);
         var target = board.getPiece(pos);
         if(validAttack(target)) {
@@ -208,8 +202,7 @@ public class ChessPiece {
 
     /**
      * Check move validity; semantic functions
-     * @param target
-     * @return
+     * @param target piece
      */
     private boolean validMove(ChessPiece target) {
         return target == null;
