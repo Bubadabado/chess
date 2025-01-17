@@ -105,7 +105,9 @@ public class ChessPiece {
         return moves;
     }
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = rookMoves(board, myPosition);
+        moves.addAll(bishopMoves(board, myPosition));
+        return moves;
     }
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         List<int[]> offsets = Arrays.asList(
@@ -130,6 +132,7 @@ public class ChessPiece {
     }
 
     /**
+     * TODO: supply a bifunction to allow createMoveList support for all piece types
      * Creates a list of moves valid move sgiven a list of offset tuples
      * @param board game board
      * @param myPosition start position
