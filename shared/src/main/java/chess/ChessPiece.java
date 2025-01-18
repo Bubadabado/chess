@@ -80,11 +80,6 @@ public class ChessPiece {
         };
     }
 
-    //oob checking
-    private boolean isOutOfBounds(ChessPosition pos) {
-        return pos.getRowConverted() < 0 || pos.getRowConverted() >= ChessBoard.BOARD_SIZE || pos.getColConverted() < 0 || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
-    }
-
     /*Individual Piece moves*/
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
         int row_begin = myPosition.getRowConverted() - 1;
@@ -119,7 +114,24 @@ public class ChessPiece {
         return createMoveList(board, myPosition, offsets);
     }
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        for(int i = 0; i < 8; i++) {
+            //use modulus calculations to determine the knight's move combination
+            int row = (i % 2) + 1;              //1 or 2
+            int col = ((i + 1) % 2) + 1;        //2 or 1
+            int rsign = (1 - 2 * ((i / 2) % 2));//alternating pattern (1, -1)
+            int csign = (1 - 2 * ((i / 4) % 2));//double alternating pattern (1, 1, -1, -1)
+            var pos = new ChessPosition(
+                    myPosition.getRowConverted() + (row * rsign),
+                    myPosition.getColConverted() + (col * csign), true);
+            if(!isOutOfBounds(pos)) {
+                var target = board.getPiece(pos);
+                if(validMove(target) || validAttack(target)) {
+                    moves.add(new ChessMove(myPosition, pos));
+                }
+            }
+        }
+        return moves;
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         List<int[]> offsets = Arrays.asList(
@@ -130,9 +142,50 @@ public class ChessPiece {
         );
         return createMoveList(board, myPosition, offsets);
     }
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+        //TODO: promote to anything
+        //TODO: double move at the beginning
+        Collection<ChessMove> moves = new ArrayList<>();
+        int i = myPosition.getRowConverted() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1);
+        int j = myPosition.getColConverted() - 1;
+        var pos = new ChessPosition(i, j, true);
+        ChessPiece target;
+        if(!isOutOfBounds(pos)){
+            target = board.getPiece(pos);
+            if(validAttack(target)) {
+                moves.add(new ChessMove(myPosition, pos));
+            }
+        }
+        pos.setCol(pos.getColumn() + 1);
+        if(!isOutOfBounds(pos)){
+            //single move
+            target = board.getPiece(pos);
+            if(validMove(target)) {
+                moves.add(new ChessMove(myPosition, pos));
+                //double move
+//                if((myPosition.getRowConverted() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK) ||
+//                        (myPosition.getRowConverted() == ChessBoard.BOARD_SIZE - 2 && this.pieceColor == ChessGame.TeamColor.WHITE)) {
+//                    pos.setRow(pos.getRow() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1));
+//                    target = board.getPiece(pos);
+//                    if(validMove(target)) {
+//                        moves.add(new ChessMove(myPosition, pos));
+//                    }
+//                    pos.setRow(pos.getRow() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1));
+//                }
+            }
+        }
+        pos.setCol(pos.getColumn() + 1);
+        if(!isOutOfBounds(pos)){
+            target = board.getPiece(pos);
+            if(validAttack(target)) {
+                moves.add(new ChessMove(myPosition, pos));
+            }
+        }
+        return moves;
+    }
 
     /**
-     * TODO: supply a bifunction to allow createMoveList support for all piece types
+     * TODO: supply a bifunction parameter to allow createMoveList support for all piece types
      * Creates a list of moves valid move sgiven a list of offset tuples
      * @param board game board
      * @param myPosition start position
@@ -166,7 +219,6 @@ public class ChessPiece {
         if(validMove(target)) {
             positions.addAll(incrementalPositionCheck(board, newPos, roff, coff));
         }
-        System.out.println(positions);
         return positions;
     }
 
@@ -182,29 +234,8 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        //TODO: dependant on team
-        int i = myPosition.getRowConverted() - 1;
-        int j = myPosition.getColConverted() - 1;
-        var pos = new ChessPosition(i, j, true);
-        var target = board.getPiece(pos);
-        if(validAttack(target)) {
-            moves.add(new ChessMove(myPosition, pos));
-        }
-        pos.setCol(pos.getColConverted() + 1);
-        if(validMove(board.getPiece(pos))) {
-            moves.add(new ChessMove(myPosition, pos));
-        }
-        pos.setCol(pos.getColConverted() + 1);
-        if(validAttack(target)) {
-            moves.add(new ChessMove(myPosition, pos));
-        }
-        return moves;
-    }
-
     /**
-     * Check move validity; semantic functions
+     * Check move validity; semantic functions, distinguished for the sake of the pawn's special movement options
      * @param target piece
      */
     private boolean validMove(ChessPiece target) {
@@ -212,5 +243,9 @@ public class ChessPiece {
     }
     private boolean validAttack(ChessPiece target) {
         return target != null && target.pieceColor != this.pieceColor;
+    }
+    //oob checking
+    private boolean isOutOfBounds(ChessPosition pos) {
+        return pos.getRowConverted() < 0 || pos.getRowConverted() >= ChessBoard.BOARD_SIZE || pos.getColConverted() < 0 || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
     }
 }
