@@ -143,8 +143,6 @@ public class ChessPiece {
         return createMoveList(board, myPosition, offsets);
     }
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
-        //TODO: promote to anything
-        //TODO: double move at the beginning
         Collection<ChessMove> moves = new ArrayList<>();
         int i = myPosition.getRowConverted() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1);
         int j = myPosition.getColConverted() - 1;
@@ -153,39 +151,61 @@ public class ChessPiece {
         if(!isOutOfBounds(pos)){
             target = board.getPiece(pos);
             if(validAttack(target)) {
-                moves.add(new ChessMove(myPosition, pos));
+                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
+                    moves.addAll(createPromotions(myPosition, pos));
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, pos));
+                }
             }
         }
-        pos.setCol(pos.getColumn() + 1);
+        pos = new ChessPosition(i, j + 1, true);
         if(!isOutOfBounds(pos)){
             //single move
             target = board.getPiece(pos);
             if(validMove(target)) {
-                moves.add(new ChessMove(myPosition, pos));
-                //double move
-//                if((myPosition.getRowConverted() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK) ||
-//                        (myPosition.getRowConverted() == ChessBoard.BOARD_SIZE - 2 && this.pieceColor == ChessGame.TeamColor.WHITE)) {
-//                    pos.setRow(pos.getRow() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1));
-//                    target = board.getPiece(pos);
-//                    if(validMove(target)) {
-//                        moves.add(new ChessMove(myPosition, pos));
-//                    }
-//                    pos.setRow(pos.getRow() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1));
-//                }
+                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
+                    moves.addAll(createPromotions(myPosition, pos));
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, pos));
+                    //double move
+                    if((myPosition.getRowConverted() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK) ||
+                            (myPosition.getRowConverted() == ChessBoard.BOARD_SIZE - 2 && this.pieceColor == ChessGame.TeamColor.WHITE)) {
+                        pos = new ChessPosition(i + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1), j + 1, true);
+                        target = board.getPiece(pos);
+                        if(validMove(target)) {
+                            moves.add(new ChessMove(myPosition, pos));
+                        }
+                    }
+                }
             }
         }
-        pos.setCol(pos.getColumn() + 1);
+        pos = new ChessPosition(i, j + 2, true);
         if(!isOutOfBounds(pos)){
             target = board.getPiece(pos);
             if(validAttack(target)) {
-                moves.add(new ChessMove(myPosition, pos));
+                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
+                    moves.addAll(createPromotions(myPosition, pos));
+                } else {
+                    moves.add(new ChessMove(myPosition, pos));
+                }
             }
         }
         return moves;
     }
 
+    private Collection<ChessMove> createPromotions(ChessPosition myPosition, ChessPosition pos) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        moves.add(new ChessMove(myPosition, pos, PieceType.ROOK));
+        moves.add(new ChessMove(myPosition, pos, PieceType.KNIGHT));
+        moves.add(new ChessMove(myPosition, pos, PieceType.BISHOP));
+        moves.add(new ChessMove(myPosition, pos, PieceType.QUEEN));
+        return moves;
+    }
+
     /**
-     * TODO: supply a bifunction parameter to allow createMoveList support for all piece types
+     * TODO: supply a bifunction parameter to allow createMoveList support for more modular piece types
      * Creates a list of moves valid move sgiven a list of offset tuples
      * @param board game board
      * @param myPosition start position
