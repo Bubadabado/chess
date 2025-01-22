@@ -82,13 +82,13 @@ public class ChessPiece {
 
     /*Individual Piece moves*/
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        int row_begin = myPosition.getRowConverted() - 1;
-        int row_end   = myPosition.getRowConverted() + 1;
-        int col_begin = myPosition.getColConverted() - 1;
-        int col_end   = myPosition.getColConverted() + 1;
+        int rowBegin = myPosition.getRowConverted() - 1;
+        int rowEnd   = myPosition.getRowConverted() + 1;
+        int colBegin = myPosition.getColConverted() - 1;
+        int colEnd   = myPosition.getColConverted() + 1;
         Collection<ChessMove> moves = new ArrayList<>();
-        for(var i = row_begin; i <= row_end; i++) {
-            for (var j = col_begin; j <= col_end; j++) {
+        for(var i = rowBegin; i <= rowEnd; i++) {
+            for (var j = colBegin; j <= colEnd; j++) {
                 var pos = new ChessPosition(i, j, true);
                 if(isOutOfBounds(pos)) { continue; }
                 var target = board.getPiece(pos);
