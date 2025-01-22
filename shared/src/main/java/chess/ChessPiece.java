@@ -269,7 +269,12 @@ public class ChessPiece {
             return validAttack(target);
         }
     }
-    //oob checking
+
+    /**
+     * Check OOB
+     * @param pos position
+     * @return whether the given position is out of bounds
+     */
     private boolean isOutOfBounds(ChessPosition pos) {
         return pos.getRowConverted() < 0
                 || pos.getRowConverted() >= ChessBoard.BOARD_SIZE

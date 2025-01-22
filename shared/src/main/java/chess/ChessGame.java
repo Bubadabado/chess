@@ -13,10 +13,11 @@ import java.util.stream.*;
 public class ChessGame {
 
     private ChessBoard board;
-
+    private TeamColor currentTeamTurn;
 
     public ChessGame() {
         board = new ChessBoard();
+        currentTeamTurn = TeamColor.WHITE;
         board.resetBoard();
     }
 
@@ -24,7 +25,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return currentTeamTurn;
     }
 
     /**
@@ -33,7 +34,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        currentTeamTurn = team;
     }
 
     /**
@@ -116,8 +117,6 @@ public class ChessGame {
         }
         return teamPositions;
     }
-
-
 
     /**
      * Sets this game's chessboard with a given board
