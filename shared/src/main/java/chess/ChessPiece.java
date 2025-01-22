@@ -148,53 +148,42 @@ public class ChessPiece {
         int j = myPosition.getColConverted() - 1;
         var pos = new ChessPosition(i, j, true);
         ChessPiece target;
-        if(!isOutOfBounds(pos)){
-            target = board.getPiece(pos);
-            if(validAttack(target)) {
-                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
-                    moves.addAll(createPromotions(myPosition, pos));
-                }
-                else {
-                    moves.add(new ChessMove(myPosition, pos));
-                }
-            }
-        }
+        moves.addAll(validatePawnAttack(board, myPosition, pos));
         pos = new ChessPosition(i, j + 1, true);
-        if(!isOutOfBounds(pos)){
-            //single move
-            target = board.getPiece(pos);
-            if(validMove(target)) {
-                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
-                    moves.addAll(createPromotions(myPosition, pos));
-                }
-                else {
-                    moves.add(new ChessMove(myPosition, pos));
-                    //double move
-                    if((myPosition.getRowConverted() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK) ||
-                            (myPosition.getRowConverted() == ChessBoard.BOARD_SIZE - 2 && this.pieceColor == ChessGame.TeamColor.WHITE)) {
-                        pos = new ChessPosition(i + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1), j + 1, true);
-                        target = board.getPiece(pos);
-                        if(validMove(target)) {
-                            moves.add(new ChessMove(myPosition, pos));
-                        }
+        //single move
+        if(validMove(pos, board)) {
+            if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
+                moves.addAll(createPromotions(myPosition, pos));
+            }
+            else {
+                moves.add(new ChessMove(myPosition, pos));
+                //double move
+                if((myPosition.getRowConverted() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK) ||
+                        (myPosition.getRowConverted() == ChessBoard.BOARD_SIZE - 2 && this.pieceColor == ChessGame.TeamColor.WHITE)) {
+                    pos = new ChessPosition(i + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1), j + 1, true);
+                    if(validMove(pos, board)) {
+                        moves.add(new ChessMove(myPosition, pos));
                     }
                 }
             }
         }
         pos = new ChessPosition(i, j + 2, true);
-        if(!isOutOfBounds(pos)){
-            target = board.getPiece(pos);
-            if(validAttack(target)) {
-                if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
-                    moves.addAll(createPromotions(myPosition, pos));
-                } else {
-                    moves.add(new ChessMove(myPosition, pos));
-                }
+        moves.addAll(validatePawnAttack(board, myPosition, pos));
+        return moves;
+    }
+
+    private Collection<ChessMove> validatePawnAttack(ChessBoard board, ChessPosition myPosition, ChessPosition pos) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        if(validAttack(pos, board)) {
+            if(pos.getRowConverted() == 0 || pos.getRowConverted() == ChessBoard.BOARD_SIZE - 1) {
+                moves.addAll(createPromotions(myPosition, pos));
+            }
+            else {
+                moves.add(new ChessMove(myPosition, pos));
             }
         }
         return moves;
     }
-
     private Collection<ChessMove> createPromotions(ChessPosition myPosition, ChessPosition pos) {
         Collection<ChessMove> moves = new ArrayList<>();
         moves.add(new ChessMove(myPosition, pos, PieceType.ROOK));
@@ -261,11 +250,30 @@ public class ChessPiece {
     private boolean validMove(ChessPiece target) {
         return target == null;
     }
+    private boolean validMove(ChessPosition pos, ChessBoard board) {
+        if(isOutOfBounds(pos)) {
+            return false;
+        } else {
+            ChessPiece target = board.getPiece(pos);
+            return validMove(target);
+        }
+    }
     private boolean validAttack(ChessPiece target) {
         return target != null && target.pieceColor != this.pieceColor;
     }
+    private boolean validAttack(ChessPosition pos, ChessBoard board) {
+        if(isOutOfBounds(pos)) {
+            return false;
+        } else {
+            ChessPiece target = board.getPiece(pos);
+            return validAttack(target);
+        }
+    }
     //oob checking
     private boolean isOutOfBounds(ChessPosition pos) {
-        return pos.getRowConverted() < 0 || pos.getRowConverted() >= ChessBoard.BOARD_SIZE || pos.getColConverted() < 0 || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
+        return pos.getRowConverted() < 0
+                || pos.getRowConverted() >= ChessBoard.BOARD_SIZE
+                || pos.getColConverted() < 0
+                || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
     }
 }
