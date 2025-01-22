@@ -68,12 +68,17 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in check
-     *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return getTeamPositions(otherTeam(teamColor)).stream().anyMatch(position -> {
+            return (board.getPiece(position) != null)
+                    && ((board.getPiece(position).pieceMoves(board, position)
+                        .contains(new ChessMove(position, getKingPosition(teamColor))))
+                    || (board.getPiece(position).pieceMoves(board, position)
+                        .contains(new ChessMove(position, getKingPosition(teamColor), ChessPiece.PieceType.BISHOP))));
+        });
     }
 
     /**
@@ -102,8 +107,8 @@ public class ChessGame {
 
     /**
      * Gets all piece positions of the given team color
-     * @param teamColor
-     * @return
+     * @param teamColor color
+     * @return all positions of pieces of the color
      */
     private Collection<ChessPosition> getTeamPositions(TeamColor teamColor) {
         Collection<ChessPosition> teamPositions = new ArrayList<>();
@@ -119,8 +124,29 @@ public class ChessGame {
     }
 
     /**
+     * @param teamColor color
+     * @return the king's position
+     */
+    private ChessPosition getKingPosition(TeamColor teamColor) {
+        var positions = getTeamPositions(teamColor);
+        for(var position : positions) {
+            if(board.getPiece(position).getPieceType() == ChessPiece.PieceType.KING) {
+                return position;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param color color
+     * @return other team's color
+     */
+    private TeamColor otherTeam(TeamColor color) {
+        return (color == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+    }
+
+    /**
      * Sets this game's chessboard with a given board
-     *
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
@@ -129,7 +155,6 @@ public class ChessGame {
 
     /**
      * Gets the current chessboard
-     *
      * @return the chessboard
      */
     public ChessBoard getBoard() {
