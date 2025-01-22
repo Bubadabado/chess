@@ -147,7 +147,7 @@ public class ChessPiece {
         int i = myPosition.getRowConverted() + ((this.pieceColor == ChessGame.TeamColor.WHITE) ? -1 : 1);
         int j = myPosition.getColConverted() - 1;
         var pos = new ChessPosition(i, j, true);
-        ChessPiece target;
+        //attack
         moves.addAll(validatePawnAttack(board, myPosition, pos));
         pos = new ChessPosition(i, j + 1, true);
         //single move
@@ -167,11 +167,11 @@ public class ChessPiece {
                 }
             }
         }
+        //attack
         pos = new ChessPosition(i, j + 2, true);
         moves.addAll(validatePawnAttack(board, myPosition, pos));
         return moves;
     }
-
     private Collection<ChessMove> validatePawnAttack(ChessBoard board, ChessPosition myPosition, ChessPosition pos) {
         Collection<ChessMove> moves = new ArrayList<>();
         if(validAttack(pos, board)) {

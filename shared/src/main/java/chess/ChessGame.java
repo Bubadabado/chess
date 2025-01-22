@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -91,8 +93,31 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return getTeamPositions(teamColor).stream().anyMatch(position -> {
+            return (board.getPiece(position) != null)
+                    && !(board.getPiece(position).pieceMoves(board, position).isEmpty());
+        });
     }
+
+    /**
+     * Gets all piece positions of the given team color
+     * @param teamColor
+     * @return
+     */
+    private Collection<ChessPosition> getTeamPositions(TeamColor teamColor) {
+        Collection<ChessPosition> teamPositions = new ArrayList<>();
+        for(int i = 0; i < ChessBoard.BOARD_SIZE; i++) {
+            for(int j = 0; j < ChessBoard.BOARD_SIZE; j++) {
+                ChessPosition pos = new ChessPosition(i, j, true);
+                if(board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor) {
+                    teamPositions.add(pos);
+                }
+            }
+        }
+        return teamPositions;
+    }
+
+
 
     /**
      * Sets this game's chessboard with a given board
@@ -100,7 +125,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
