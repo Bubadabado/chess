@@ -26,6 +26,15 @@ public class ChessBoard {
     public ChessBoard() {
         this.board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
     }
+    public ChessBoard(ChessBoard other) {
+        this();
+        for(int row = 0; row < BOARD_SIZE; row++) {
+            for(int col = 0; col < BOARD_SIZE; col++) {
+                var pos = new ChessPosition(row, col, true);
+                this.addPiece(pos, new ChessPiece(other.getPiece(pos)));
+            }
+        }
+    }
 
     /**
      * Adds a chess piece to the chessboard
