@@ -63,7 +63,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if(validMoves(move.getStartPosition()).contains(move)) {
+            board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition())));
+            board.removePiece(move.getStartPosition());
+        } else {
+            throw new InvalidMoveException();
+        }
     }
 
     /**
@@ -72,12 +77,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        return isInCheck(teamColor, this.board);
+    }
+    public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
         return getTeamPositions(otherTeam(teamColor)).stream().anyMatch(position -> {
             return (board.getPiece(position) != null)
                     && ((board.getPiece(position).pieceMoves(board, position)
-                        .contains(new ChessMove(position, getKingPosition(teamColor))))
+                    .contains(new ChessMove(position, getKingPosition(teamColor))))
                     || (board.getPiece(position).pieceMoves(board, position)
-                        .contains(new ChessMove(position, getKingPosition(teamColor), ChessPiece.PieceType.BISHOP))));
+                    .contains(new ChessMove(position, getKingPosition(teamColor), ChessPiece.PieceType.BISHOP))));
         });
     }
 
@@ -88,7 +96,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && !kingHasValidMoves(teamColor);
+    }
+
+    public boolean kingHasValidMoves(TeamColor teamColor) {
+        var pos = getKingPosition(teamColor); //TODO: check null
+        var moves = board.getPiece(pos).pieceMoves(board, pos);
+//        for(var move: moves) {
+//
+//        }
+        return false;
     }
 
     /**
@@ -99,9 +116,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return getTeamPositions(teamColor).stream().anyMatch(position -> {
-            return (board.getPiece(position) != null)
-                    && !(board.getPiece(position).pieceMoves(board, position).isEmpty());
+        //TODO: handle king moves into check when not in check
+        return !isInCheck(teamColor) && getTeamPositions(teamColor).stream().noneMatch(position -> {
+            return !board.getPiece(position).pieceMoves(board, position).isEmpty(); //(board.getPiece(position) != null) &&
         });
     }
 

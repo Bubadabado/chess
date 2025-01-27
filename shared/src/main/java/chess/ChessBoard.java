@@ -29,12 +29,19 @@ public class ChessBoard {
 
     /**
      * Adds a chess piece to the chessboard
-     *
      * @param position where to add the piece to
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRowConverted()][position.getColConverted()] = piece;//new ChessPiece(piece);
+    }
+
+    /**
+     * removes a chesspiece
+     * @param position the position to remove
+     */
+    public void removePiece(ChessPosition position) {
+        addPiece(position, null);
     }
 
     /**

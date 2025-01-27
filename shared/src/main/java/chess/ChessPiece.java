@@ -71,12 +71,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch (type) {
-            case PieceType.KING   -> kingMoves  (board, myPosition);
-            case PieceType.QUEEN  -> queenMoves (board, myPosition);
-            case PieceType.BISHOP -> bishopMoves(board, myPosition);
-            case PieceType.KNIGHT -> knightMoves(board, myPosition);
-            case PieceType.ROOK   -> rookMoves  (board, myPosition);
-            case PieceType.PAWN   -> pawnMoves  (board, myPosition);
+            case KING   -> kingMoves  (board, myPosition);
+            case QUEEN  -> queenMoves (board, myPosition);
+            case BISHOP -> bishopMoves(board, myPosition);
+            case KNIGHT -> knightMoves(board, myPosition);
+            case ROOK   -> rookMoves  (board, myPosition);
+            case PAWN   -> pawnMoves  (board, myPosition);
         };
     }
 
