@@ -90,7 +90,7 @@ public class ChessPiece {
         for(var i = rowBegin; i <= rowEnd; i++) {
             for (var j = colBegin; j <= colEnd; j++) {
                 var pos = new ChessPosition(i, j, true);
-                if(isOutOfBounds(pos)) { continue; }
+                if(ChessBoard.isOutOfBounds(pos)) { continue; }
                 var target = board.getPiece(pos);
                 if (validMove(target) || validAttack(target)) {
                     moves.add(new ChessMove(myPosition, pos));
@@ -124,7 +124,7 @@ public class ChessPiece {
             var pos = new ChessPosition(
                     myPosition.getRowConverted() + (row * rsign),
                     myPosition.getColConverted() + (col * csign), true);
-            if(!isOutOfBounds(pos)) {
+            if(!ChessBoard.isOutOfBounds(pos)) {
                 var target = board.getPiece(pos);
                 if(validMove(target) || validAttack(target)) {
                     moves.add(new ChessMove(myPosition, pos));
@@ -222,7 +222,7 @@ public class ChessPiece {
         int row = myPosition.getRowConverted() + roff;
         int col = myPosition.getColConverted() + coff;
         var newPos = new ChessPosition(row, col, true);
-        if(isOutOfBounds(newPos)) { return new ArrayList<>(); }
+        if(ChessBoard.isOutOfBounds(newPos)) { return new ArrayList<>(); }
         var target = board.getPiece(newPos);
         Collection<ChessPosition> positions = ((validAttack(target) || validMove(target))) ? new ArrayList<>(List.of(newPos)) : new ArrayList<>();
         if(validMove(target)) {
@@ -251,7 +251,7 @@ public class ChessPiece {
         return target == null;
     }
     private boolean validMove(ChessPosition pos, ChessBoard board) {
-        if(isOutOfBounds(pos)) {
+        if(ChessBoard.isOutOfBounds(pos)) {
             return false;
         } else {
             ChessPiece target = board.getPiece(pos);
@@ -262,7 +262,7 @@ public class ChessPiece {
         return target != null && target.pieceColor != this.pieceColor;
     }
     private boolean validAttack(ChessPosition pos, ChessBoard board) {
-        if(isOutOfBounds(pos)) {
+        if(ChessBoard.isOutOfBounds(pos)) {
             return false;
         } else {
             ChessPiece target = board.getPiece(pos);
@@ -270,15 +270,8 @@ public class ChessPiece {
         }
     }
 
-    /**
-     * Check OOB
-     * @param pos position
-     * @return whether the given position is out of bounds
-     */
-    private boolean isOutOfBounds(ChessPosition pos) {
-        return pos.getRowConverted() < 0
-                || pos.getRowConverted() >= ChessBoard.BOARD_SIZE
-                || pos.getColConverted() < 0
-                || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
+    @Override
+    public String toString() {
+        return "Color: " + pieceColor + ". Type: " + type;
     }
 }

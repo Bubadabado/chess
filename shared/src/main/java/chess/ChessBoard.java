@@ -27,11 +27,14 @@ public class ChessBoard {
         this.board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
     }
     public ChessBoard(ChessBoard other) {
-        this();
+        this.board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
         for(int row = 0; row < BOARD_SIZE; row++) {
             for(int col = 0; col < BOARD_SIZE; col++) {
                 var pos = new ChessPosition(row, col, true);
-                this.addPiece(pos, new ChessPiece(other.getPiece(pos)));
+                var piece = other.getPiece(pos);
+                if(piece != null) {
+                    this.addPiece(pos, new ChessPiece(piece));
+                }
             }
         }
     }
@@ -96,6 +99,18 @@ public class ChessBoard {
                 addPiece(new ChessPosition(row, col, true), new ChessPiece(color, type));
         int[] col = {0}; //used like a pointer to allow index incrementing within lambda function
         asList(BACK_ROW_ORDER).forEach(piece -> addBackRowPiece.accept(col[0]++, piece));
+    }
+
+    /**
+     * Check OOB
+     * @param pos position
+     * @return whether the given position is out of bounds
+     */
+    public static boolean isOutOfBounds(ChessPosition pos) {
+        return pos.getRowConverted() < 0
+                || pos.getRowConverted() >= ChessBoard.BOARD_SIZE
+                || pos.getColConverted() < 0
+                || pos.getColConverted() >= ChessBoard.BOARD_SIZE;
     }
 
     @Override

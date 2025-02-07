@@ -2,6 +2,8 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.stream.*;
 
 /**
@@ -53,7 +55,52 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        return validMoves(startPosition, board);
+    }
+    private Collection<ChessMove> validMoves(ChessPosition startPosition, ChessBoard board) {
+        var target = board.getPiece(startPosition);
+        var newMoves = new ArrayList<ChessMove>();
+        if(ChessBoard.isOutOfBounds(startPosition) || target == null) {
+            return newMoves;
+        }
+        var moves = target.pieceMoves(board, startPosition);
+        var unsafeTiles = threatenedTiles(otherTeam(target.getTeamColor()), board);
+        //TODO: detect threatened tiles on allied pieces
+        for(var move: moves) {
+            var newBoard = new ChessBoard(board);
+            makeValidMove(move, newBoard);
+//            if(target.getPieceType() == ChessPiece.PieceType.KING && !unsafeTiles.contains(move.getEndPosition())) {
+//                if(!isInCheck(target.getTeamColor(), newBoard)) {
+//                    newMoves.add(move);
+//                }
+//
+//            } else if(!isInCheck(target.getTeamColor(), newBoard)
+//                    && (target.getPieceType() != ChessPiece.PieceType.KING
+//                    || !unsafeTiles.contains(move.getEndPosition()))) {
+//                newMoves.add(move);
+//            }
+            if(!isInCheck(target.getTeamColor(), newBoard)) {
+                newMoves.add(move);
+            }
+        }
+        return newMoves;
+    }
+
+    /**
+     * @param color color of the team to check
+     * @return a list of positions threatened by the given team
+     */
+    private Collection<ChessPosition> threatenedTiles(TeamColor color, ChessBoard board) {
+        var piecePositions = getTeamPositions(color);
+        var tiles = new ArrayList<ChessPosition>();
+        for(var pos: piecePositions) {
+            var target = board.getPiece(pos);
+            tiles.addAll(target.pieceMoves(board, pos)
+                    .stream()
+                    .map(ChessMove::getEndPosition)
+                    .toList());
+        }
+        return tiles;
     }
 
     /**
@@ -63,12 +110,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if(validMoves(move.getStartPosition()).contains(move)) {
-            board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition())));
-            board.removePiece(move.getStartPosition());
+        if(board.getPiece(move.getStartPosition()) != null
+                && board.getPiece(move.getStartPosition()).getTeamColor() == currentTeamTurn
+                && validMoves(move.getStartPosition()).contains(move)) {
+            makeValidMove(move, board);
+            currentTeamTurn = otherTeam(currentTeamTurn);
         } else {
             throw new InvalidMoveException();
         }
+    }
+    /**
+     * Makes a move, assuming that it is already valid.
+     * @param move move
+     * @param board board
+     */
+    private void makeValidMove(ChessMove move, ChessBoard board) {
+        var target = board.getPiece(move.getStartPosition());
+        board.addPiece(move.getEndPosition(), new ChessPiece(
+                target.getTeamColor(),
+                (move.getPromotionPiece() == null) ? target.getPieceType() : move.getPromotionPiece()
+        ));
+        board.removePiece(move.getStartPosition());
     }
 
     /**
@@ -79,14 +141,8 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         return isInCheck(teamColor, this.board);
     }
-    public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
-        return getTeamPositions(otherTeam(teamColor)).stream().anyMatch(position -> {
-            return (board.getPiece(position) != null)
-                    && ((board.getPiece(position).pieceMoves(board, position)
-                    .contains(new ChessMove(position, getKingPosition(teamColor))))
-                    || (board.getPiece(position).pieceMoves(board, position)
-                    .contains(new ChessMove(position, getKingPosition(teamColor), ChessPiece.PieceType.BISHOP))));
-        });
+    private boolean isInCheck(TeamColor teamColor, ChessBoard board) {
+        return threatenedTiles(otherTeam(teamColor), board).contains(getKingPosition(teamColor, board));
     }
 
     /**
@@ -96,16 +152,37 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && !kingHasValidMoves(teamColor);
+        var threatsToKing = threateningPieces(otherTeam(teamColor), getKingPosition(teamColor));
+        boolean pieceCanBlock = (threatsToKing.size() == 1)
+                && threateningPieces(teamColor, threatsToKing.getFirst())
+                    .stream()
+                    .map(board::getPiece)
+                    .anyMatch(piece -> piece.getPieceType() != ChessPiece.PieceType.KING);
+        return isInCheck(teamColor) && !kingHasValidMoves(teamColor) && !pieceCanBlock;
     }
 
-    public boolean kingHasValidMoves(TeamColor teamColor) {
-        var pos = getKingPosition(teamColor); //TODO: check null
-        var moves = board.getPiece(pos).pieceMoves(board, pos);
-//        for(var move: moves) {
-//
-//        }
-        return false;
+    /**
+     * @param teamColor
+     * @param pos
+     * @return the pieces of a given color that threaten the position
+     */
+    private ArrayList<ChessPosition> threateningPieces(TeamColor teamColor, ChessPosition pos) {
+        return new ArrayList<>(getTeamPositions(teamColor)
+                .stream()
+                .filter(position -> {
+                    return validMoves(position)
+                            .stream()
+                            .map(ChessMove::getEndPosition)
+                            .toList()
+                            .contains(pos);
+                })
+                .toList());
+    }
+
+    private boolean kingHasValidMoves(TeamColor teamColor) {
+        var pos = getKingPosition(teamColor);
+        validMoves(pos).forEach(System.out::println);
+        return !validMoves(pos).isEmpty();
     }
 
     /**
@@ -116,9 +193,8 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        //TODO: handle king moves into check when not in check
-        return !isInCheck(teamColor) && getTeamPositions(teamColor).stream().noneMatch(position -> {
-            return !board.getPiece(position).pieceMoves(board, position).isEmpty(); //(board.getPiece(position) != null) &&
+        return !isInCheck(teamColor) && getTeamPositions(teamColor).stream().allMatch(position -> {
+            return validMoves(position, board).isEmpty();
         });
     }
 
@@ -128,6 +204,9 @@ public class ChessGame {
      * @return all positions of pieces of the color
      */
     private Collection<ChessPosition> getTeamPositions(TeamColor teamColor) {
+        return getTeamPositions(teamColor, board);
+    }
+    private Collection<ChessPosition> getTeamPositions(TeamColor teamColor, ChessBoard board) {
         Collection<ChessPosition> teamPositions = new ArrayList<>();
         for(int i = 0; i < ChessBoard.BOARD_SIZE; i++) {
             for(int j = 0; j < ChessBoard.BOARD_SIZE; j++) {
@@ -145,7 +224,10 @@ public class ChessGame {
      * @return the king's position
      */
     private ChessPosition getKingPosition(TeamColor teamColor) {
-        var positions = getTeamPositions(teamColor);
+        return getKingPosition(teamColor, board);
+    }
+    private ChessPosition getKingPosition(TeamColor teamColor, ChessBoard board) {
+        var positions = getTeamPositions(teamColor, board);
         for(var position : positions) {
             if(board.getPiece(position).getPieceType() == ChessPiece.PieceType.KING) {
                 return position;
