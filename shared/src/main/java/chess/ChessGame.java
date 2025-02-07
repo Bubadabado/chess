@@ -167,6 +167,10 @@ public class ChessGame {
                 .toList());
     }
 
+    /**
+     * @param teamColor color
+     * @return whether the given team's king has valid moves available
+     */
     private boolean kingHasValidMoves(TeamColor teamColor) {
         var pos = getKingPosition(teamColor);
         validMoves(pos).forEach(System.out::println);
