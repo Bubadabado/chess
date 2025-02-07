@@ -64,21 +64,9 @@ public class ChessGame {
             return newMoves;
         }
         var moves = target.pieceMoves(board, startPosition);
-        var unsafeTiles = threatenedTiles(otherTeam(target.getTeamColor()), board);
-        //TODO: detect threatened tiles on allied pieces
         for(var move: moves) {
             var newBoard = new ChessBoard(board);
             makeValidMove(move, newBoard);
-//            if(target.getPieceType() == ChessPiece.PieceType.KING && !unsafeTiles.contains(move.getEndPosition())) {
-//                if(!isInCheck(target.getTeamColor(), newBoard)) {
-//                    newMoves.add(move);
-//                }
-//
-//            } else if(!isInCheck(target.getTeamColor(), newBoard)
-//                    && (target.getPieceType() != ChessPiece.PieceType.KING
-//                    || !unsafeTiles.contains(move.getEndPosition()))) {
-//                newMoves.add(move);
-//            }
             if(!isInCheck(target.getTeamColor(), newBoard)) {
                 newMoves.add(move);
             }
