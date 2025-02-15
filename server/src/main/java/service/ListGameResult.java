@@ -1,4 +1,8 @@
 package service;
 
-public record ListGameResult(int gameID, String whiteUsername, String blackUsername, String gameName) {
+import model.GameData;
+
+import java.util.ArrayList;
+
+public record ListGameResult(ArrayList<GameData> gameList) {
 }
