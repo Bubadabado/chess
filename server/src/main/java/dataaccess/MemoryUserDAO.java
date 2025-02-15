@@ -2,20 +2,24 @@ package dataaccess;
 
 import model.UserData;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 public class MemoryUserDAO implements UserDAO{
+    private static Hashtable<String, UserData> users;
 
     @Override
     public UserData getUser(String username) {
-        return null; //TODO
+       return users.get(username);
     }
 
     @Override
     public void createUser(UserData userData) {
-        //TODO
+        users.put(userData.username(), userData);
     }
 
     @Override
     public void clearUsers() {
-        //TODO: clear users
+        users.clear();
     }
 }
