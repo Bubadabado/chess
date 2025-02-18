@@ -6,7 +6,7 @@ import model.GameData;
 import java.util.Hashtable;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private static Hashtable<String, AuthData> auths;
+    private static final Hashtable<String, AuthData> auths = new Hashtable<>();
 
     @Override
     public void createAuth(AuthData authData) {

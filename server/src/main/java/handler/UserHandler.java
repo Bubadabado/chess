@@ -11,4 +11,6 @@ public class UserHandler {
         var regres = UserService.register(regreq);
         return serializer.toJson(regres);
     }
+    //TODO: handle login
+    //TODO: handle logout
 }

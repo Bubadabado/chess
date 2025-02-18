@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class MemoryGameDAO implements GameDAO {
-    private static Hashtable<Integer, GameData> games;
+    private static final Hashtable<Integer, GameData> games = new Hashtable<>();
     private static int runningID = 0;
 
     @Override

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class MemoryUserDAO implements UserDAO{
-    private static Hashtable<String, UserData> users;
+    private static final Hashtable<String, UserData> users = new Hashtable<>();
 
     @Override
     public UserData getUser(String username) {
