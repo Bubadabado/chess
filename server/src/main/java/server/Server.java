@@ -1,5 +1,6 @@
 package server;
 
+import handler.UserHandler;
 import spark.*;
 
 public class Server {
@@ -25,9 +26,8 @@ public class Server {
     }
 
     private static void createRoutes() {
-        Spark.get("/path", (req, res) -> "test");
         Spark.delete("/db", (req, res) -> "TODO clear");
-        Spark.post("/user", (req, res) -> "TODO Register");
+        Spark.post("/user", (req, res) -> UserHandler.handleRegister(req.body()));
         Spark.post("/session", (req, res) -> "TODO login");
         Spark.delete("/session", (req, res) -> "TODO logout");
         Spark.get("/game", (req, res) -> "TODO list games");

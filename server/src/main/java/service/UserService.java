@@ -6,7 +6,7 @@ import model.AuthData;
 import model.UserData;
 
 public class UserService {
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public static RegisterResult register(RegisterRequest registerRequest) {
 //        try {
         var users = new MemoryUserDAO();
         var auths = new MemoryAuthDAO();
