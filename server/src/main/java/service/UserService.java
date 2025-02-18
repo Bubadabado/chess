@@ -35,5 +35,8 @@ public class UserService {
             return new LoginResult("", "");
         }
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(LogoutRequest logoutRequest) {
+        var auths = new MemoryAuthDAO();
+        auths.deleteAuth(logoutRequest.authToken());
+    }
 }
