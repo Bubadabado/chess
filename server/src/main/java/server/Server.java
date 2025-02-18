@@ -12,7 +12,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+//        Spark.init();
+        createRoutes();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -21,5 +22,16 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private static void createRoutes() {
+        Spark.get("/path", (req, res) -> "test");
+        Spark.delete("/db", (req, res) -> "TODO clear");
+        Spark.post("/user", (req, res) -> "TODO Register");
+        Spark.post("/session", (req, res) -> "TODO login");
+        Spark.delete("/session", (req, res) -> "TODO logout");
+        Spark.get("/game", (req, res) -> "TODO list games");
+        Spark.post("/game", (req, res) -> "TODO create game");
+        Spark.put("/game", (req, res) -> "TODO join game");
     }
 }
