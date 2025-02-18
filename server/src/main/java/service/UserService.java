@@ -24,8 +24,16 @@ public class UserService {
 //
 //        }
     }
-//    public LoginResult login(LoginRequest loginRequest) {
-//
-//    }
+    public LoginResult login(LoginRequest loginRequest) {
+        var users = new MemoryUserDAO();
+        var auths = new MemoryAuthDAO();
+        if(loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
+            var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
+            auths.createAuth(authData);
+            return new LoginResult(authData.username(), authData.authToken());
+        } else {
+            return new LoginResult("", "");
+        }
+    }
     public void logout(LogoutRequest logoutRequest) {}
 }
