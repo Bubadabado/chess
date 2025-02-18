@@ -24,7 +24,7 @@ public class UserService {
 //
 //        }
     }
-    public LoginResult login(LoginRequest loginRequest) {
+    public static LoginResult login(LoginRequest loginRequest) {
         var users = new MemoryUserDAO();
         var auths = new MemoryAuthDAO();
         if(loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
@@ -35,7 +35,7 @@ public class UserService {
             return new LoginResult("", "");
         }
     }
-    public void logout(LogoutRequest logoutRequest) {
+    public static void logout(LogoutRequest logoutRequest) {
         var auths = new MemoryAuthDAO();
         auths.deleteAuth(logoutRequest.authToken());
     }
