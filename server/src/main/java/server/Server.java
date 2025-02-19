@@ -29,7 +29,7 @@ public class Server {
         Spark.delete("/db", (req, res) -> "TODO clear");
         Spark.post("/user", (req, res) -> UserHandler.handleRegister(req.body()));
         Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
-        Spark.delete("/session", (req, res) -> "TODO logout");
+        Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.body()));
         Spark.get("/game", (req, res) -> "TODO list games");
         Spark.post("/game", (req, res) -> "TODO create game");
         Spark.put("/game", (req, res) -> "TODO join game");

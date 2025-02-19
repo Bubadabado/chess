@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import service.LoginRequest;
+import service.LogoutRequest;
 import service.RegisterRequest;
 import service.UserService;
 
@@ -18,6 +19,11 @@ public class UserHandler {
         var loginres = UserService.login(loginreq);
         return serializer.toJson(loginres);
     }
-    //TODO: handle login
-    //TODO: handle logout
+    public static String handleLogout(String data) {
+        var serializer = new Gson();
+        var logoutreq = serializer.fromJson(data, LogoutRequest.class);
+        UserService.logout(logoutreq);
+        //TODO: handle errors
+        return "";
+    }
 }
