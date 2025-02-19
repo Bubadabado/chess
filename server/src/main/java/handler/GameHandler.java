@@ -9,7 +9,8 @@ import service.ListGameRequest;
 public class GameHandler {
     public static String handleListGames(String data) {
         var serializer = new Gson();
-        var lgreq = serializer.fromJson(data, ListGameRequest.class);
+        System.out.println(data);
+        var lgreq = new ListGameRequest(data);//serializer.fromJson(data, ListGameRequest.class);
         var lgres = GameService.listGames(lgreq);
         return serializer.toJson(lgres);
     }
