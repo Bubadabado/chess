@@ -15,7 +15,6 @@ public class GameService {
         }
     }
     public static CreateGameResult createGame(CreateGameRequest createGameRequest) {
-
         var games = new MemoryGameDAO();
         if(checkAuth(createGameRequest.authToken())) {
             return new CreateGameResult(games.createGame(createGameRequest.gameName()));
@@ -24,11 +23,25 @@ public class GameService {
         }
     }
     public static void joinGame(JoinGameRequest joinGameRequest) {
-
+        var auths = new MemoryAuthDAO();
+        var games = new MemoryGameDAO();
+        if(checkAuth(joinGameRequest.authToken())
+                && colorNotTaken(joinGameRequest.gameID(), joinGameRequest.playerColor())) {
+            var username = auths.getAuth(joinGameRequest.authToken()).username();
+            games.joinGame(username, joinGameRequest.playerColor(), joinGameRequest.gameID());
+        }
     }
 
     private static boolean checkAuth(String authToken) {
         var auths = new MemoryAuthDAO();
         return auths.getAuth(authToken) != null;
+    }
+    private static boolean checkGame(int gameID) {
+        var games = new MemoryGameDAO();
+        return games.findGame(gameID) != null;
+    }
+    private static boolean colorNotTaken(int gameID, String playerColor) {
+        var games = new MemoryGameDAO();
+        return checkGame(gameID) && games.getColor(playerColor, gameID).isEmpty();
     }
 }
