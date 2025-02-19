@@ -6,7 +6,7 @@ import dataaccess.MemoryGameDAO;
 import java.util.ArrayList;
 
 public class GameService {
-    public ListGameResult listGames(ListGameRequest listGameRequest) {
+    public static ListGameResult listGames(ListGameRequest listGameRequest) {
         var games = new MemoryGameDAO();
         if(checkAuth(listGameRequest.authToken())) {
             return new ListGameResult(games.listGames());
@@ -14,7 +14,7 @@ public class GameService {
             return new ListGameResult(new ArrayList<>());
         }
     }
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) {
+    public static CreateGameResult createGame(CreateGameRequest createGameRequest) {
 
         var games = new MemoryGameDAO();
         if(checkAuth(createGameRequest.authToken())) {
@@ -23,11 +23,11 @@ public class GameService {
             return new CreateGameResult(-1);
         }
     }
-    public void joinGame(JoinGameRequest joinGameRequest) {
+    public static void joinGame(JoinGameRequest joinGameRequest) {
 
     }
 
-    private boolean checkAuth(String authToken) {
+    private static boolean checkAuth(String authToken) {
         var auths = new MemoryAuthDAO();
         return auths.getAuth(authToken) != null;
     }
