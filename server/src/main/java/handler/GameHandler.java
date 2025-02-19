@@ -2,6 +2,7 @@ package handler;
 import com.google.gson.Gson;
 import service.CreateGameRequest;
 import service.GameService;
+import service.JoinGameRequest;
 import service.ListGameRequest;
 
 
@@ -17,5 +18,12 @@ public class GameHandler {
         var cgreq = serializer.fromJson(data, CreateGameRequest.class);
         var cgres = GameService.createGame(cgreq);
         return serializer.toJson(cgres);
+    }
+    public static String handleJoinGame(String data) {
+        var serializer = new Gson();
+        var jgreq = serializer.fromJson(data, JoinGameRequest.class);
+        GameService.joinGame(jgreq);
+        //TODO: error handling
+        return "";
     }
 }

@@ -33,6 +33,6 @@ public class Server {
         Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.body()));
         Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.body()));
         Spark.post("/game", (req, res) -> GameHandler.handleCreateGame(req.body()));
-        Spark.put("/game", (req, res) -> "TODO join game");
+        Spark.put("/game", (req, res) -> GameHandler.handleJoinGame(req.body()));
     }
 }
