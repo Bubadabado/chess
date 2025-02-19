@@ -1,5 +1,6 @@
 package server;
 
+import handler.GameHandler;
 import handler.UserHandler;
 import spark.*;
 
@@ -30,8 +31,8 @@ public class Server {
         Spark.post("/user", (req, res) -> UserHandler.handleRegister(req.body()));
         Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
         Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.body()));
-        Spark.get("/game", (req, res) -> "TODO list games");
-        Spark.post("/game", (req, res) -> "TODO create game");
+        Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.body()));
+        Spark.post("/game", (req, res) -> GameHandler.handleCreateGame(req.body()));
         Spark.put("/game", (req, res) -> "TODO join game");
     }
 }
