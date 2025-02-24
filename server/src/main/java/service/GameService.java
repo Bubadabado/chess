@@ -16,6 +16,8 @@ public class GameService {
     }
     public static CreateGameResult createGame(CreateGameRequest createGameRequest) {
         var games = new MemoryGameDAO();
+        System.out.println(createGameRequest.authToken());
+        System.out.println(checkAuth(createGameRequest.authToken()));
         if(checkAuth(createGameRequest.authToken())) {
             return new CreateGameResult(games.createGame(createGameRequest.gameName()));
         } else {
@@ -34,6 +36,7 @@ public class GameService {
 
     private static boolean checkAuth(String authToken) {
         var auths = new MemoryAuthDAO();
+        System.out.println(auths);
         return auths.getAuth(authToken) != null;
     }
     private static boolean checkGame(int gameID) {

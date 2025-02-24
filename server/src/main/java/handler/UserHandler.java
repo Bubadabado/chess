@@ -20,8 +20,8 @@ public class UserHandler {
         return serializer.toJson(loginres);
     }
     public static String handleLogout(String data) {
-        var serializer = new Gson();
-        var logoutreq = serializer.fromJson(data, LogoutRequest.class);
+        //var serializer = new Gson();
+        var logoutreq = new LogoutRequest(data);//serializer.fromJson(data, LogoutRequest.class);
         UserService.logout(logoutreq);
         //TODO: handle errors
         return "";

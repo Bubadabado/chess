@@ -10,7 +10,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     @Override
     public void createAuth(AuthData authData) {
-        auths.put(authData.username(), authData);
+        auths.put(authData.authToken(), authData);
     }
 
     @Override
@@ -26,5 +26,10 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public void clearAuths() {
         auths.clear();
+    }
+
+    @Override
+    public String toString() {
+        return auths.toString();
     }
 }
