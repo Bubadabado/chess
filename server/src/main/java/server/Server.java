@@ -1,5 +1,6 @@
 package server;
 
+import handler.AdminHandler;
 import handler.GameHandler;
 import handler.UserHandler;
 import spark.*;
@@ -27,7 +28,7 @@ public class Server {
     }
 
     private static void createRoutes() {
-        Spark.delete("/db", (req, res) -> "TODO clear");
+        Spark.delete("/db", (req, res) -> AdminHandler.clear());
         Spark.post("/user", (req, res) -> UserHandler.handleRegister(req.body()));
         Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
         Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.headers("authorization")));

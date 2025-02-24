@@ -22,7 +22,7 @@ public class GameHandler {
     }
     public static String handleJoinGame(String data, String auth) {
         var serializer = new Gson();
-        var jgrb = serializer.fromJson(data, joinGameRequestBody.class);
+        var jgrb = serializer.fromJson(data, JoinGameRequestBody.class);
         var jgreq = new JoinGameRequest(auth, jgrb.playerColor(), jgrb.gameID());
         GameService.joinGame(jgreq);
         //TODO: error handling
