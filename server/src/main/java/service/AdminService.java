@@ -24,10 +24,4 @@ public class AdminService {
         var games = new MemoryGameDAO();
         games.clearGames();
     }
-
-    private static boolean checkAuth(String authToken) throws DataAccessException {
-        var auths = new MemoryAuthDAO();
-        return auths.getAuth(authToken) != null;
-    }
-
 }
