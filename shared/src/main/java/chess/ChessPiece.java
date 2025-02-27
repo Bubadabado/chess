@@ -194,7 +194,6 @@ public class ChessPiece {
     }
 
     /**
-     * TODO: supply a bifunction parameter to allow createMoveList support for more modular piece types
      * Creates a list of moves valid move sgiven a list of offset tuples
      * @param board game board
      * @param myPosition start position

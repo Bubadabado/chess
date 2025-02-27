@@ -1,7 +1,6 @@
 package handler;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
 import service.*;
 import spark.Request;

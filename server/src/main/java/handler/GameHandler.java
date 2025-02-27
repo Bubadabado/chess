@@ -5,8 +5,6 @@ import service.*;
 import spark.Request;
 import spark.Response;
 
-import java.util.Locale;
-
 
 public class GameHandler {
     public static String handleListGames(Request req, Response res) {
