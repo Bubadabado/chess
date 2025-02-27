@@ -9,10 +9,10 @@ import java.util.Hashtable;
 
 public class MemoryGameDAO implements GameDAO {
     private static final Hashtable<Integer, GameData> games = new Hashtable<>();
-    private static int runningID = 0;
+    private static int runningID = 1;
 
     @Override
-    public int createGame(String gameName) {
+    public int createGame(String gameName) throws DataAccessException {
         games.put(runningID, new GameData(runningID, "", "", gameName, new ChessGame()));
         runningID++;
         return runningID - 1;

@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 
@@ -15,14 +16,18 @@ public class GameService {
             return new ListGameResult(new ArrayList<>());
         }
     }
-    public static CreateGameResult createGame(CreateGameRequest createGameRequest) {
+    public static CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         var games = new MemoryGameDAO();
-        System.out.println(createGameRequest.authToken());
-        System.out.println(checkAuth(createGameRequest.authToken()));
-        if(checkAuth(createGameRequest.authToken())) {
-            return new CreateGameResult(games.createGame(createGameRequest.gameName()));
-        } else {
-            return new CreateGameResult(-1);
+//        System.out.println(createGameRequest.authToken());
+//        System.out.println(checkAuth(createGameRequest.authToken()));
+        try {
+            if(createGameRequest.authToken() != null && checkAuth(createGameRequest.authToken())) {
+                return new CreateGameResult(games.createGame(createGameRequest.gameName()));
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            throw e;
         }
     }
     public static void joinGame(JoinGameRequest joinGameRequest) {
