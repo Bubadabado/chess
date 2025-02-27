@@ -40,8 +40,22 @@ public class UserService {
             throw e;
         }
     }
-//    public static void logout(LogoutRequest logoutRequest) {
-//        var auths = new MemoryAuthDAO();
-//        auths.deleteAuth(logoutRequest.authToken());
-//    }
+    public static void logout(LogoutRequest logoutRequest) throws DataAccessException {
+        var auths = new MemoryAuthDAO();
+        try {
+            if(logoutRequest.authToken() != null && checkAuth(logoutRequest.authToken())) {
+                auths.deleteAuth(logoutRequest.authToken());
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        }
+
+    }
+    private static boolean checkAuth(String authToken) {
+        var auths = new MemoryAuthDAO();
+        System.out.println(auths);
+        return auths.getAuth(authToken) != null;
+    }
 }

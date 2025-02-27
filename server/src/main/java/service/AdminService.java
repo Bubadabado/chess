@@ -6,14 +6,14 @@ import dataaccess.MemoryUserDAO;
 
 public class AdminService {
     public static boolean clear(String authToken) {
-        if(authToken != null && checkAuth(authToken)) {
+//        if(authToken != null && checkAuth(authToken)) {
             clearAuths();
             clearUsers();
             clearGames();
             return true;
-        } else {
-            return false;
-        }
+//        } else {
+//            return false;
+//        }
     }
     public static void clearAuths() {
         var auths = new MemoryAuthDAO();

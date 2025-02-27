@@ -36,11 +36,18 @@ public class UserHandler {
             return serializer.toJson(new ErrorStatus(e.getMessage()));
         }
     }
-    public static String handleLogout(String data) {
-//        //var serializer = new Gson();
-//        var logoutreq = new LogoutRequest(data);//serializer.fromJson(data, LogoutRequest.class);
-//        UserService.logout(logoutreq);
-//        //TODO: handle errors
-        return "";
+    public static String handleLogout(Request req, Response res) {
+        var serializer = new Gson();
+        String data = req.headers("Authorization");
+        System.out.println(req.headers());
+        try {
+            var logoutreq = new LogoutRequest(data);
+
+            UserService.logout(logoutreq);
+            return "";
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(new ErrorStatus(e.getMessage()));
+        }
     }
 }
