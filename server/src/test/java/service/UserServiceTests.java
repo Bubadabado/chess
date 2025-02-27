@@ -50,10 +50,17 @@ public class UserServiceTests {
 
     @Test
     public void testLogoutSuccess() {
-
+        reset();
+        Assertions.assertDoesNotThrow(() -> {
+            var regreq = UserService.register(new RegisterRequest("test", "pwd", "email"));
+            UserService.logout(new LogoutRequest(regreq.authToken()));
+        });
     }
     @Test
     public void testLogoutFailure() {
-
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            UserService.register(new RegisterRequest("test", "pwd", "email"));
+            UserService.logout(new LogoutRequest("bad auth"));
+        });
     }
 }
