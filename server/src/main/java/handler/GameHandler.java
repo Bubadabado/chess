@@ -15,7 +15,6 @@ public class GameHandler {
         try {
             var lgreq = new ListGameRequest(data);
             var lgres = GameService.listGames(lgreq);
-            System.out.println(serializer.toJson(lgres));
             return serializer.toJson(lgres);
         } catch (DataAccessException e) {
             res.status(401);

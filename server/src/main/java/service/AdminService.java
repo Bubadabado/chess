@@ -6,10 +6,11 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 
 public class AdminService {
-    public static void clear() {
+    public static boolean clear() {
         clearAuths();
         clearUsers();
         clearGames();
+        return true;
     }
     private static void clearAuths() {
         var auths = new MemoryAuthDAO();
