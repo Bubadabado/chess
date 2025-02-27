@@ -28,12 +28,12 @@ public class Server {
     }
 
     private static void createRoutes() {
-        Spark.delete("/db", (req, res) -> AdminHandler.clear());
-        Spark.post("/user", (req, res) -> UserHandler.handleRegister(req.body()));
-        Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
-        Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.headers("authorization")));
-        Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.headers("authorization")));
-        Spark.post("/game", (req, res) -> GameHandler.handleCreateGame(req.body(), req.headers("authorization")));
-        Spark.put("/game", (req, res) -> GameHandler.handleJoinGame(req.body(), req.headers("authorization")));
+        Spark.delete("/db", AdminHandler::clear);
+        Spark.post("/user", (req, res) -> UserHandler.handleRegister(req, res));
+//        Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
+//        Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.headers("authorization")));
+//        Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.headers("authorization")));
+//        Spark.post("/game", (req, res) -> GameHandler.handleCreateGame(req.body(), req.headers("authorization")));
+//        Spark.put("/game", (req, res) -> GameHandler.handleJoinGame(req.body(), req.headers("authorization")));
     }
 }

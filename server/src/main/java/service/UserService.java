@@ -1,42 +1,43 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 
 public class UserService {
-    public static RegisterResult register(RegisterRequest registerRequest) {
-//        try {
+    public static RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         var users = new MemoryUserDAO();
         var auths = new MemoryAuthDAO();
-        if(users.getUser(registerRequest.username()) == null) {
-            users.createUser(new UserData(registerRequest.username(),
-                    registerRequest.password(),
-                    registerRequest.email()));
-            var authData = new AuthData(AuthGen.generateAuthToken(), registerRequest.username());
-            auths.createAuth(authData);
-            return new RegisterResult(authData.username(), authData.authToken());
-        } else {
-            return new RegisterResult("", "");
+        try {
+            if(users.getUser(registerRequest.username()) == null) {
+                users.createUser(new UserData(registerRequest.username(),
+                        registerRequest.password(),
+                        registerRequest.email()));
+                var authData = new AuthData(AuthGen.generateAuthToken(), registerRequest.username());
+                auths.createAuth(authData);
+                return new RegisterResult(authData.username(), authData.authToken());
+            } else {
+                throw new DataAccessException("Error: already taken");
+            }
+        } catch (DataAccessException e) {
+            throw e;
         }
-//        } catch (DataAccessException e) {
-//
+    }
+//    public static LoginResult login(LoginRequest loginRequest) {
+//        var users = new MemoryUserDAO();
+//        var auths = new MemoryAuthDAO();
+//        if(users.getUser(loginRequest.username()) != null && loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
+//            var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
+//            auths.createAuth(authData);
+//            return new LoginResult(authData.username(), authData.authToken());
+//        } else {
+//            return new LoginResult("", "");
 //        }
-    }
-    public static LoginResult login(LoginRequest loginRequest) {
-        var users = new MemoryUserDAO();
-        var auths = new MemoryAuthDAO();
-        if(loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
-            var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
-            auths.createAuth(authData);
-            return new LoginResult(authData.username(), authData.authToken());
-        } else {
-            return new LoginResult("", "");
-        }
-    }
-    public static void logout(LogoutRequest logoutRequest) {
-        var auths = new MemoryAuthDAO();
-        auths.deleteAuth(logoutRequest.authToken());
-    }
+//    }
+//    public static void logout(LogoutRequest logoutRequest) {
+//        var auths = new MemoryAuthDAO();
+//        auths.deleteAuth(logoutRequest.authToken());
+//    }
 }

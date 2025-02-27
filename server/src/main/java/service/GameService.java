@@ -4,6 +4,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GameService {
     public static ListGameResult listGames(ListGameRequest listGameRequest) {
@@ -30,7 +31,7 @@ public class GameService {
         if(checkAuth(joinGameRequest.authToken())
                 && colorNotTaken(joinGameRequest.gameID(), joinGameRequest.playerColor())) {
             var username = auths.getAuth(joinGameRequest.authToken()).username();
-            games.joinGame(username, joinGameRequest.playerColor(), joinGameRequest.gameID());
+            games.joinGame(username, joinGameRequest.playerColor().toLowerCase(), joinGameRequest.gameID());
         }
     }
 
@@ -44,7 +45,11 @@ public class GameService {
         return games.findGame(gameID) != null;
     }
     private static boolean colorNotTaken(int gameID, String playerColor) {
+        if(playerColor == null) { return false; }
         var games = new MemoryGameDAO();
-        return checkGame(gameID) && games.getColor(playerColor, gameID).isEmpty();
+        playerColor = playerColor.toLowerCase();
+        return checkGame(gameID)
+                && (playerColor.equals("black") || playerColor.equals("white"))
+                && games.getColor(playerColor, gameID).isEmpty();
     }
 }

@@ -9,12 +9,12 @@ public class MemoryUserDAO implements UserDAO{
     private static final Hashtable<String, UserData> users = new Hashtable<>();
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
        return users.get(username);
     }
 
     @Override
-    public void createUser(UserData userData) {
+    public void createUser(UserData userData) throws DataAccessException {
         users.put(userData.username(), userData);
     }
 
