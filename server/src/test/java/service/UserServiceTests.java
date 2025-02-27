@@ -15,7 +15,7 @@ public class UserServiceTests {
         String actual = "something else";
         try {
             actual = UserService.register(new RegisterRequest("test", "pwd", "email")).username();
-        } catch (DataAccessException _) {}
+        } catch (DataAccessException e) {}
         Assertions.assertEquals(expected, actual);
     }
     @Test
@@ -35,7 +35,7 @@ public class UserServiceTests {
         try {
             UserService.register(new RegisterRequest("test", "pwd", "email"));
             actual = UserService.login(new LoginRequest("test", "pwd")).username();
-        } catch (DataAccessException _) {}
+        } catch (DataAccessException e) {}
         Assertions.assertEquals(expected, actual);
     }
     @Test

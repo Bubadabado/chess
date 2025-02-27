@@ -15,7 +15,7 @@ public class GameServiceTests {
         try {
             var regRes = UserService.register(new RegisterRequest("test", "pwd", "email"));
             id = GameService.createGame(new CreateGameRequest(regRes.authToken(), "new game")).gameID();
-        } catch (DataAccessException _) {}
+        } catch (DataAccessException e) {}
         Assertions.assertEquals(1, id);
     }
     @Test
@@ -36,7 +36,7 @@ public class GameServiceTests {
             var regRes = UserService.register(new RegisterRequest("test", "pwd", "email"));
             GameService.createGame(new CreateGameRequest(regRes.authToken(), "new game"));
             actual = GameService.listGames(new ListGameRequest(regRes.authToken())).toString();
-        } catch (DataAccessException _) {}
+        } catch (DataAccessException e) {}
         Assertions.assertEquals(expected, actual);
     }
     @Test
