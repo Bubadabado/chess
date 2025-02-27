@@ -29,8 +29,8 @@ public class Server {
 
     private static void createRoutes() {
         Spark.delete("/db", AdminHandler::clear);
-        Spark.post("/user", (req, res) -> UserHandler.handleRegister(req, res));
-//        Spark.post("/session", (req, res) -> UserHandler.handleLogin(req.body()));
+        Spark.post("/user", UserHandler::handleRegister);
+        Spark.post("/session", UserHandler::handleLogin);
 //        Spark.delete("/session", (req, res) -> UserHandler.handleLogout(req.headers("authorization")));
 //        Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.headers("authorization")));
 //        Spark.post("/game", (req, res) -> GameHandler.handleCreateGame(req.body(), req.headers("authorization")));

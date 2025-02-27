@@ -25,17 +25,21 @@ public class UserService {
             throw e;
         }
     }
-//    public static LoginResult login(LoginRequest loginRequest) {
-//        var users = new MemoryUserDAO();
-//        var auths = new MemoryAuthDAO();
-//        if(users.getUser(loginRequest.username()) != null && loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
-//            var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
-//            auths.createAuth(authData);
-//            return new LoginResult(authData.username(), authData.authToken());
-//        } else {
-//            return new LoginResult("", "");
-//        }
-//    }
+    public static LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        var users = new MemoryUserDAO();
+        var auths = new MemoryAuthDAO();
+        try {
+            if(users.getUser(loginRequest.username()) != null && loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
+                var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
+                auths.createAuth(authData);
+                return new LoginResult(authData.username(), authData.authToken());
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        }
+    }
 //    public static void logout(LogoutRequest logoutRequest) {
 //        var auths = new MemoryAuthDAO();
 //        auths.deleteAuth(logoutRequest.authToken());

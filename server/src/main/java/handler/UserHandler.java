@@ -24,12 +24,17 @@ public class UserHandler {
             return serializer.toJson(new ErrorStatus(e.getMessage()));
         }
     }
-    public static String handleLogin(String data) {
-//        var serializer = new Gson();
-//        var loginreq = serializer.fromJson(data, LoginRequest.class);
-//        var loginres = UserService.login(loginreq);
-//        return serializer.toJson(loginres);
-        return "";
+    public static String handleLogin(Request req, Response res) {
+        var serializer = new Gson();
+        String data = req.body();
+        try {
+            var loginreq = serializer.fromJson(data, LoginRequest.class);
+            var loginres = UserService.login(loginreq);
+            return serializer.toJson(loginres);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(new ErrorStatus(e.getMessage()));
+        }
     }
     public static String handleLogout(String data) {
 //        //var serializer = new Gson();
