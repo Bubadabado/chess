@@ -51,10 +51,20 @@ public class GameServiceTests {
 
     @Test
     public void testJoinGameSuccess() {
-
+        reset();
+        Assertions.assertDoesNotThrow(() -> {
+            var regRes = UserService.register(new RegisterRequest("test", "pwd", "email"));
+            GameService.createGame(new CreateGameRequest(regRes.authToken(), "new game"));
+            GameService.joinGame(new JoinGameRequest(regRes.authToken(), "black", 1));
+        });
     }
     @Test
     public void testJoinGameFailure() {
-
+        reset();
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            var regRes = UserService.register(new RegisterRequest("test", "pwd", "email"));
+            GameService.createGame(new CreateGameRequest(regRes.authToken(), "new game"));
+            GameService.joinGame(new JoinGameRequest("invalid auth", "black", 1));
+        });
     }
 }
