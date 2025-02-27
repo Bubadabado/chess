@@ -30,11 +30,22 @@ public class UserServiceTests {
 
     @Test
     public void testLoginSuccess() {
-
+        reset();
+        var actual = "";
+        var expected = "test";
+        try {
+            UserService.register(new RegisterRequest("test", "pwd", "email"));
+            actual = UserService.login(new LoginRequest("test", "pwd")).username();
+        } catch (DataAccessException _) {}
+        Assertions.assertEquals(expected, actual);
     }
     @Test
     public void testLoginFailure() {
-
+        reset();
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            UserService.register(new RegisterRequest("test", "pwd", "email"));
+            UserService.login(new LoginRequest("test", "wrong_pwd")).username();
+        });
     }
 
     @Test
