@@ -32,8 +32,8 @@ public class Server {
         Spark.post("/user", UserHandler::handleRegister);
         Spark.post("/session", UserHandler::handleLogin);
         Spark.delete("/session", UserHandler::handleLogout);
-//        Spark.get("/game", (req, res) -> GameHandler.handleListGames(req.headers("authorization")));
+        Spark.get("/game", GameHandler::handleListGames);
         Spark.post("/game", GameHandler::handleCreateGame);
-//        Spark.put("/game", (req, res) -> GameHandler.handleJoinGame(req.body(), req.headers("authorization")));
+        Spark.put("/game", GameHandler::handleJoinGame);
     }
 }

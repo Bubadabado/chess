@@ -2,8 +2,8 @@ package model;
 
 import chess.ChessGame;
 
-public record GameData(int GameID, String whiteUsername, String blackUsername,
-                       String gameName, ChessGame game) {
+public record GameData(int gameID, String whiteUsername, String blackUsername,
+                       String gameName) {
     public GameData addColor(String username, String playerColor) {
         return ((playerColor.equals("white")) ? addWhite(username) : addBlack(username));
     }
@@ -11,9 +11,9 @@ public record GameData(int GameID, String whiteUsername, String blackUsername,
         return ((playerColor.equals("white")) ? whiteUsername : blackUsername );
     }
     GameData addWhite(String username) {
-        return new GameData(GameID, username, blackUsername, blackUsername, game);
+        return new GameData(gameID, username, blackUsername, gameName);
     }
     GameData addBlack(String username) {
-        return new GameData(GameID, whiteUsername, username, blackUsername, game);
+        return new GameData(gameID, whiteUsername, username, gameName);
     }
 }

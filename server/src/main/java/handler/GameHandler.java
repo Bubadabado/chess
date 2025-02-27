@@ -5,14 +5,22 @@ import service.*;
 import spark.Request;
 import spark.Response;
 
+import java.util.Locale;
+
 
 public class GameHandler {
-    public static String handleListGames(String data) {
+    public static String handleListGames(Request req, Response res) {
+        String data = req.headers("authorization");
         var serializer = new Gson();
-        System.out.println(data); //TODO remove
-        var lgreq = new ListGameRequest(data);//serializer.fromJson(data, ListGameRequest.class);
-        var lgres = GameService.listGames(lgreq);
-        return serializer.toJson(lgres);
+        try {
+            var lgreq = new ListGameRequest(data);
+            var lgres = GameService.listGames(lgreq);
+            System.out.println(serializer.toJson(lgres));
+            return serializer.toJson(lgres);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(new ErrorStatus(e.getMessage()));
+        }
     }
     public static String handleCreateGame(Request req, Response res) {
         var serializer = new Gson();
@@ -32,13 +40,28 @@ public class GameHandler {
             return serializer.toJson(new ErrorStatus(e.getMessage()));
         }
     }
-    public static String handleJoinGame(String data, String auth) {
+    public static String handleJoinGame(Request req, Response res) {
         var serializer = new Gson();
-        var jgrb = serializer.fromJson(data, JoinGameRequestBody.class);
-        var jgreq = new JoinGameRequest(auth, jgrb.playerColor(), jgrb.gameID());
-        GameService.joinGame(jgreq);
-        //TODO: error handling
-        //TODO: caps independence
-        return "";
+        String data = req.body();
+        String auth = req.headers("authorization");
+        try {
+            var jgrb = serializer.fromJson(data, JoinGameRequestBody.class);
+            if(auth == null
+                    || jgrb.playerColor() == null
+                    || !isValidPlayerColor(jgrb.playerColor().toLowerCase())
+                    || jgrb.gameID() < 1) {
+                res.status(400);
+                return serializer.toJson(new ErrorStatus("Error: bad request"));
+            }
+            var jgreq = new JoinGameRequest(auth, jgrb.playerColor().toLowerCase(), jgrb.gameID());
+            GameService.joinGame(jgreq);
+            return "";
+        } catch (DataAccessException e) {
+            res.status(((e.getMessage().equals("Error: unauthorized")) ? 401 : 403));
+            return serializer.toJson(new ErrorStatus(e.getMessage()));
+        }
+    }
+    private static boolean isValidPlayerColor(String playerColor) {
+        return playerColor.equals("black") || playerColor.equals("white");
     }
 }

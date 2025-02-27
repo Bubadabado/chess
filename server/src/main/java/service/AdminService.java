@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -28,7 +29,7 @@ public class AdminService {
         games.clearGames();
     }
 
-    private static boolean checkAuth(String authToken) {
+    private static boolean checkAuth(String authToken) throws DataAccessException {
         var auths = new MemoryAuthDAO();
         return auths.getAuth(authToken) != null;
     }

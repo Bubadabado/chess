@@ -39,10 +39,8 @@ public class UserHandler {
     public static String handleLogout(Request req, Response res) {
         var serializer = new Gson();
         String data = req.headers("Authorization");
-        System.out.println(req.headers());
         try {
             var logoutreq = new LogoutRequest(data);
-
             UserService.logout(logoutreq);
             return "";
         } catch (DataAccessException e) {

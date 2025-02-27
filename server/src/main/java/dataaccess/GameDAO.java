@@ -9,6 +9,6 @@ public interface GameDAO {
     public GameData findGame(int gameID);
     public void joinGame(String username, String playerColor, int gameID);
     public String getColor(String playerColor, int gameID);
-    public ArrayList<GameData> listGames();
+    public ArrayList<GameData> listGames() throws DataAccessException;
     public void clearGames();
 }

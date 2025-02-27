@@ -53,7 +53,7 @@ public class UserService {
         }
 
     }
-    private static boolean checkAuth(String authToken) {
+    private static boolean checkAuth(String authToken) throws DataAccessException {
         var auths = new MemoryAuthDAO();
         System.out.println(auths);
         return auths.getAuth(authToken) != null;
