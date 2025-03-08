@@ -41,7 +41,24 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public String getColor(String playerColor, int gameID) {
-        return "";
+        try (var conn = DatabaseManager.getConnection()) {
+            if(!playerColor.equals("black") && !playerColor.equals("white")) {
+                throw new DataAccessException("invalid colors");
+            }
+            String col = playerColor + "_username";
+            var query = "SELECT " + col + " FROM games" +
+                    "WHERE id = ?";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setInt(1, gameID);
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                return rs.getString(col);
+            }
+        } catch (SQLException e) {
+//            throw new DataAccessException("Error: failed to connect to DB on getAuth");
+        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+        }
     }
 
     @Override
