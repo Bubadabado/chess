@@ -5,6 +5,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     public static RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
@@ -12,8 +13,9 @@ public class UserService {
         var auths = new MemoryAuthDAO();
         try {
             if(users.getUser(registerRequest.username()) == null) {
+                var hashedPwd = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
                 users.createUser(new UserData(registerRequest.username(),
-                        registerRequest.password(),
+                        hashedPwd,
                         registerRequest.email()));
                 var authData = new AuthData(AuthGen.generateAuthToken(), registerRequest.username());
                 auths.createAuth(authData);
@@ -29,7 +31,8 @@ public class UserService {
         var users = new MemoryUserDAO();
         var auths = new MemoryAuthDAO();
         try {
-            if(users.getUser(loginRequest.username()) != null && loginRequest.password().equals(users.getUser(loginRequest.username()).password())) {
+            //loginRequest.password().equals(users.getUser(loginRequest.username()).password())
+            if(users.getUser(loginRequest.username()) != null && BCrypt.checkpw(loginRequest.password(), users.getUser(loginRequest.username()).password())) {
                 var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
                 auths.createAuth(authData);
                 return new LoginResult(authData.username(), authData.authToken());

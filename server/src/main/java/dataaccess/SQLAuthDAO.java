@@ -14,7 +14,7 @@ public class SQLAuthDAO implements AuthDAO{
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, authData.authToken());
                 preparedStatement.setString(2, authData.username());
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
                 rs.next();
             }
         } catch (SQLException e) {
@@ -45,7 +45,7 @@ public class SQLAuthDAO implements AuthDAO{
                     "WHERE authtoken = ?";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, authToken);
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
                 rs.next();
             }
         } catch (SQLException e) {
@@ -58,7 +58,7 @@ public class SQLAuthDAO implements AuthDAO{
         try (var conn = DatabaseManager.getConnection()) {
             var query = "DELETE FROM auths";
             try (var preparedStatement = conn.prepareStatement(query)) {
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {}
     }

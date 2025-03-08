@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
@@ -14,7 +16,9 @@ public class SQLGameDAO implements GameDAO{
                     "VALUES(?)";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, gameName);
-                var rs = preparedStatement.executeQuery();
+                //TODO: include game json
+                var json = new Gson().toJson(new ChessGame());
+                var rs = preparedStatement.executeUpdate();
                 query = "SELECT id FROM games WHERE name = ?";
                 try (var ps = conn.prepareStatement(query)) {
                     preparedStatement.setString(1, gameName);
@@ -47,7 +51,7 @@ public class SQLGameDAO implements GameDAO{
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, username);
                 preparedStatement.setInt(2, gameID);
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
 //            throw new DataAccessException("Error: failed to connect to DB on joinGame");
@@ -76,6 +80,7 @@ public class SQLGameDAO implements GameDAO{
         } catch (DataAccessException e) {
 //            throw new RuntimeException(e);
         }
+        return null;
     }
 
     @Override

@@ -32,7 +32,7 @@ public class SQLUserDAO implements UserDAO{
         try (var conn = DatabaseManager.getConnection()) {
             var query = "DELETE FROM users";
             try (var preparedStatement = conn.prepareStatement(query)) {
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {}
     }
