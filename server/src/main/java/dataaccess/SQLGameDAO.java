@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import model.GameData;
 
 import java.sql.SQLException;
@@ -18,7 +19,24 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void joinGame(String username, String playerColor, int gameID) {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            //sanity check input
+            if(!playerColor.equals("black") && !playerColor.equals("white")) {
+                throw new DataAccessException("invalid colors");
+            }
+            var query = "UPDATE games " +
+                    "SET " + playerColor + "_username = ? " +
+                    "WHERE id = ?";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setInt(2, gameID);
+                var rs = preparedStatement.executeQuery();
+            }
+        } catch (SQLException e) {
+//            throw new DataAccessException("Error: failed to connect to DB on getAuth");
+        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+        }
     }
 
     @Override
