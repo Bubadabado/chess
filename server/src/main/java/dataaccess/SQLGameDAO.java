@@ -9,7 +9,24 @@ import java.util.ArrayList;
 public class SQLGameDAO implements GameDAO{
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        return 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            var query = "INSERT INTO games (name)" +
+                    "VALUES(?)";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setString(1, gameName);
+                var rs = preparedStatement.executeQuery();
+                query = "SELECT id FROM games WHERE name = ?";
+                try (var ps = conn.prepareStatement(query)) {
+                    preparedStatement.setString(1, gameName);
+                    var nrs = preparedStatement.executeQuery();
+                    nrs.next();
+                    return nrs.getInt("name");
+                }
+
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: failed to connect to DB on createGame");
+        }
     }
 
     @Override
@@ -33,7 +50,7 @@ public class SQLGameDAO implements GameDAO{
                 var rs = preparedStatement.executeQuery();
             }
         } catch (SQLException e) {
-//            throw new DataAccessException("Error: failed to connect to DB on getAuth");
+//            throw new DataAccessException("Error: failed to connect to DB on joinGame");
         } catch (DataAccessException e) {
 //            throw new RuntimeException(e);
         }
@@ -55,7 +72,7 @@ public class SQLGameDAO implements GameDAO{
                 return rs.getString(col);
             }
         } catch (SQLException e) {
-//            throw new DataAccessException("Error: failed to connect to DB on getAuth");
+//            throw new DataAccessException("Error: failed to connect to DB on getColor");
         } catch (DataAccessException e) {
 //            throw new RuntimeException(e);
         }
