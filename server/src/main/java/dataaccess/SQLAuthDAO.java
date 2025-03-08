@@ -8,7 +8,18 @@ import java.sql.SQLException;
 public class SQLAuthDAO implements AuthDAO{
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            var query = "INSERT INTO auths (authtoken, username)" +
+                    "VALUES(?, ?)";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setString(1, authData.authToken());
+                preparedStatement.setString(2, authData.username());
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: failed to connect to DB on createAuth");
+        }
     }
 
     @Override
