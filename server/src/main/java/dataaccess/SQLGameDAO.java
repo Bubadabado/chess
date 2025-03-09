@@ -12,7 +12,7 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public int createGame(String gameName) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var query = "INSERT INTO games (name)" +
+            var query = "INSERT INTO games (name) " +
                     "VALUES(?)";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, gameName);
@@ -67,7 +67,7 @@ public class SQLGameDAO implements GameDAO{
                 throw new DataAccessException("invalid colors");
             }
             String col = playerColor + "_username";
-            var query = "SELECT " + col + " FROM games" +
+            var query = "SELECT " + col + " FROM games " +
                     "WHERE id = ?";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setInt(1, gameID);

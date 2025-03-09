@@ -1,16 +1,14 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     public static RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
-        var users = new MemoryUserDAO();
-        var auths = new MemoryAuthDAO();
+        var users = new SQLUserDAO();//MemoryUserDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         try {
             if(users.getUser(registerRequest.username()) == null) {
                 var hashedPwd = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
@@ -28,8 +26,8 @@ public class UserService {
         }
     }
     public static LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        var users = new MemoryUserDAO();
-        var auths = new MemoryAuthDAO();
+        var users = new SQLUserDAO();//MemoryUserDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         try {
             //loginRequest.password().equals(users.getUser(loginRequest.username()).password())
             if(users.getUser(loginRequest.username()) != null && BCrypt.checkpw(loginRequest.password(), users.getUser(loginRequest.username()).password())) {
@@ -44,7 +42,7 @@ public class UserService {
         }
     }
     public static void logout(LogoutRequest logoutRequest) throws DataAccessException {
-        var auths = new MemoryAuthDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         try {
             if(logoutRequest.authToken() != null && checkAuth(logoutRequest.authToken())) {
                 auths.deleteAuth(logoutRequest.authToken());
@@ -57,7 +55,7 @@ public class UserService {
 
     }
     private static boolean checkAuth(String authToken) throws DataAccessException {
-        var auths = new MemoryAuthDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         return auths.getAuth(authToken) != null;
     }
 }

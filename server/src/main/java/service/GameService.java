@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
+import dataaccess.SQLAuthDAO;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -33,7 +34,7 @@ public class GameService {
         }
     }
     public static void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        var auths = new MemoryAuthDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         var games = new MemoryGameDAO();
         try {
             if(joinGameRequest.authToken() != null && checkAuth(joinGameRequest.authToken())) {
@@ -52,7 +53,7 @@ public class GameService {
     }
 
     private static boolean checkAuth(String authToken) throws DataAccessException {
-        var auths = new MemoryAuthDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         return auths.getAuth(authToken) != null;
     }
     private static boolean checkGame(int gameID) {

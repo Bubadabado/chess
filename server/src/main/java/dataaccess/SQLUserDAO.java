@@ -8,16 +8,19 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var query = "SELECT username, password, email FROM users" +
+            var query = "SELECT username, password, email FROM users " +
                     "WHERE username = ?";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
-                rs.next();
+                boolean empty = !rs.next();
+                if(empty) {
+                    return null;
+                }
                 return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: failed to connect to DB on getUser");
+            throw new DataAccessException("Error: failed to connect to DB on getUser\n" + e.getMessage());
         }
     }
 

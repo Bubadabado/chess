@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 
 public class AdminService {
     public static boolean clear() {
@@ -13,11 +10,11 @@ public class AdminService {
         return true;
     }
     private static void clearAuths() {
-        var auths = new MemoryAuthDAO();
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
         auths.clearAuths();
     }
     private static void clearUsers() {
-        var users = new MemoryUserDAO();
+        var users = new SQLUserDAO();//MemoryUserDAO();
         users.clearUsers();
     }
     private static void clearGames() {
