@@ -43,8 +43,56 @@ public class DatabaseManager {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
+            createTables();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+    public static void initialize() throws DataAccessException {
+        createDatabase();
+    }
+
+    static void createTables() throws SQLException {
+        createUsersTable();
+        createAuthsTable();
+        createGamesTable();
+    }
+    static void createUsersTable() throws SQLException {
+        var statement = "CREATE TABLE IF NOT EXISTS users ( " +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "username VARCHAR(255) NOT NULL, " +
+                "password VARCHAR(255) NOT NULL, " +
+                "email VARCHAR(255) NOT NULL, " +
+                "PRIMARY KEY (id) " +
+                ");";
+        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+    }
+    static void createAuthsTable() throws SQLException {
+        var statement = "CREATE TABLE IF NOT EXISTS auths ( " +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "authtoken VARCHAR(255) NOT NULL, " +
+                "username VARCHAR(255) NOT NULL, " +
+                "PRIMARY KEY (id) " +
+                ");";
+        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+    }
+    static void createGamesTable() throws SQLException {
+        var statement = "CREATE TABLE IF NOT EXISTS games ( " +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "white_username VARCHAR(255), " +
+                "black_username VARCHAR(255), " +
+                "name VARCHAR(255) NOT NULL, " +
+                "PRIMARY KEY (id) " +
+                ");";
+        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
         }
     }
 

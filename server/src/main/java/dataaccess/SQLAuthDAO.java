@@ -15,7 +15,6 @@ public class SQLAuthDAO implements AuthDAO{
                 preparedStatement.setString(1, authData.authToken());
                 preparedStatement.setString(2, authData.username());
                 var rs = preparedStatement.executeUpdate();
-                rs.next();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: failed to connect to DB on createAuth");
@@ -46,7 +45,6 @@ public class SQLAuthDAO implements AuthDAO{
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, authToken);
                 var rs = preparedStatement.executeUpdate();
-                rs.next();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error: failed to connect to DB on deleteAuth");
