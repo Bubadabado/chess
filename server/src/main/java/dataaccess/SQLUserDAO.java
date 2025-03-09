@@ -5,7 +5,6 @@ import model.UserData;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO{
-    //TODO: bCrypt
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -24,7 +23,18 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            var query = "INSERT INTO users (username, password, email) " +
+                    "VALUES (?, ?, ?)";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setString(1, userData.username());
+                preparedStatement.setString(2, userData.password());
+                preparedStatement.setString(3, userData.email());
+                var rs = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: failed to connect to DB on createUser");
+        }
     }
 
     @Override
