@@ -17,11 +17,42 @@ public class AuthDAOTests {
         var expected = "super secure auth";
         var actual = "something else";
         try {
-            auths.createAuth(new AuthData(expected, "user"));
+            auths.createAuth(new AuthData(expected, "create-user"));
             actual = auths.getAuth(expected).authToken();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
         Assertions.assertEquals(expected, actual);
+    }
+    @Test
+    public void testCreateAuthFailure() {
+        reset();
+        var auths = new SQLAuthDAO();
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            auths.createAuth(new AuthData(null, null));
+        });
+    }
+
+    @Test
+    public void testGetAuthSuccess() {
+        reset();
+        var auths = new SQLAuthDAO();
+        var expected = "super secure auth";
+        var actual = "something else";
+        try {
+            auths.createAuth(new AuthData(expected, "get-user"));
+            actual = auths.getAuth(expected).authToken();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Assertions.assertEquals(expected, actual);
+    }
+    @Test
+    public void testGetAuthFailure() {
+        reset();
+        var auths = new SQLAuthDAO();
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            auths.getAuth("literally anything").authToken();
+        });
     }
 }
