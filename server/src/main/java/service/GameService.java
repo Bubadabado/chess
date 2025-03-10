@@ -1,16 +1,13 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.SQLAuthDAO;
+import dataaccess.*;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class GameService {
     public static ListGameResult listGames(ListGameRequest listGameRequest) throws DataAccessException {
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         try {
             if (listGameRequest.authToken() != null && checkAuth(listGameRequest.authToken())) {
                 return new ListGameResult(games.listGames());
@@ -22,7 +19,7 @@ public class GameService {
         }
     }
     public static CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         try {
             if(createGameRequest.authToken() != null && checkAuth(createGameRequest.authToken())) {
                 return new CreateGameResult(games.createGame(createGameRequest.gameName()));
@@ -35,7 +32,7 @@ public class GameService {
     }
     public static void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         var auths = new SQLAuthDAO();//MemoryAuthDAO();
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         try {
             if(joinGameRequest.authToken() != null && checkAuth(joinGameRequest.authToken())) {
                 if(joinGameRequest.playerColor() != null && colorNotTaken(joinGameRequest.gameID(), joinGameRequest.playerColor())) {
@@ -57,12 +54,12 @@ public class GameService {
         return auths.getAuth(authToken) != null;
     }
     private static boolean checkGame(int gameID) {
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         return games.findGame(gameID) != null;
     }
     private static boolean colorNotTaken(int gameID, String playerColor) {
         if(playerColor == null) { return false; }
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         playerColor = playerColor.toLowerCase();
         return checkGame(gameID)
                 && (playerColor.equals("black") || playerColor.equals("white"))

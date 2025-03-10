@@ -18,7 +18,7 @@ public class AdminService {
         users.clearUsers();
     }
     private static void clearGames() {
-        var games = new MemoryGameDAO();
+        var games = new SQLGameDAO();//MemoryGameDAO();
         games.clearGames();
     }
 }

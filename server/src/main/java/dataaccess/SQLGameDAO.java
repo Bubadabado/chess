@@ -19,12 +19,14 @@ public class SQLGameDAO implements GameDAO{
                 //TODO: include game json
                 var json = new Gson().toJson(new ChessGame());
                 var rs = preparedStatement.executeUpdate();
+//                System.out.println(rs);
                 query = "SELECT id FROM games WHERE name = ?";
                 try (var ps = conn.prepareStatement(query)) {
-                    preparedStatement.setString(1, gameName);
-                    var nrs = preparedStatement.executeQuery();
+                    ps.setString(1, gameName);
+                    var nrs = ps.executeQuery();
                     nrs.next();
-                    return nrs.getInt("name");
+//                    System.out.println(nrs.getInt("id"));
+                    return nrs.getInt("id");
                 }
 
             }
@@ -104,11 +106,13 @@ public class SQLGameDAO implements GameDAO{
     public ArrayList<GameData> listGames() throws DataAccessException {
         ArrayList<GameData> games = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()) {
-            var query = "SELECT * FROM games ";
+            var query = "SELECT * FROM games";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 var rs = preparedStatement.executeQuery();
                 while(rs.next())
                 {
+                    System.out.println("found a game");
+                    System.out.println(rs.getInt("id"));
                     games.add(new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name")));
                 }
             }
@@ -125,7 +129,7 @@ public class SQLGameDAO implements GameDAO{
         try (var conn = DatabaseManager.getConnection()) {
             var query = "DELETE FROM games";
             try (var preparedStatement = conn.prepareStatement(query)) {
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {}
     }
