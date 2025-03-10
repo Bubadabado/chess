@@ -3,7 +3,7 @@ import dataaccess.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.AdminService;
+import service.*;
 
 public class UserDAOTests {
     private void reset() {
@@ -16,36 +16,46 @@ public class UserDAOTests {
         var users = new SQLUserDAO();
         var actual = new UserData("no", "no", "no");
         try {
-            users.createUser(new UserData("user", "pwd", "email"));
-            actual = users.getUser("user");
+            users.createUser(new UserData("get-user", "pwd", "email"));
+            actual = users.getUser("get-user");
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        var expected = new UserData("user", "pwd", "email");
+        var expected = new UserData("get-user", "pwd", "email");
         Assertions.assertEquals(expected, actual);
     }
     @Test
     public void testGetUserFailure() {
         reset();
         var users = new SQLUserDAO();
-        var actual = new UserData("no", "no", "no");
-        try {
-            users.createUser(new UserData("user", "pwd", "email"));
-            actual = users.getUser("name not in db");
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        String expected = null;
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            users.createUser(new UserData("get-user", "pwd", "email"));
+            var res = users.getUser("name not in db").username();
+        });
     }
 
     @Test
     public void testCreateUserSuccess() {
-        //TODO
+        reset();
+        var users = new SQLUserDAO();
+        var actual = new UserData("no", "no", "no");
+        try {
+            users.createUser(new UserData("create-user", "pwd", "email"));
+            actual = users.getUser("create-user");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        var expected = new UserData("create-user", "pwd", "email");
+        Assertions.assertEquals(expected, actual);
     }
     @Test
     public void testCreateUserFailure() {
-        //TODO
+        reset();
+        var users = new SQLUserDAO();
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            users.createUser(new UserData("create-user", "pwd", "email"));
+            var res = users.getUser("name not in db").username();
+        });
     }
 
     @Test
