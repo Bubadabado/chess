@@ -29,6 +29,9 @@ public class UserDAOTests {
 
     @Test
     public void testClearUsersSuccess() {
-        //TODO
+        var users = new SQLUserDAO();
+        var actual = users.clearUsers();
+        var expected = true;
+        Assertions.assertEquals(expected, actual);
     }
 }

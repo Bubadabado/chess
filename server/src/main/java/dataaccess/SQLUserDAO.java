@@ -41,12 +41,14 @@ public class SQLUserDAO implements UserDAO{
     }
 
     @Override
-    public void clearUsers() {
+    public boolean clearUsers() {
         try (var conn = DatabaseManager.getConnection()) {
             var query = "DELETE FROM users";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 var rs = preparedStatement.executeUpdate();
+                return true;
             }
         } catch (SQLException | DataAccessException e) {}
+        return false;
     }
 }
