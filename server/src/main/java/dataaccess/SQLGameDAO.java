@@ -19,13 +19,11 @@ public class SQLGameDAO implements GameDAO{
                 //TODO: include game json
                 var json = new Gson().toJson(new ChessGame());
                 var rs = preparedStatement.executeUpdate();
-//                System.out.println(rs);
                 query = "SELECT id FROM games WHERE name = ?";
                 try (var ps = conn.prepareStatement(query)) {
                     ps.setString(1, gameName);
                     var nrs = ps.executeQuery();
                     nrs.next();
-//                    System.out.println(nrs.getInt("id"));
                     return nrs.getInt("id");
                 }
 
