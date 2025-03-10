@@ -52,6 +52,7 @@ public class SQLGameDAO implements GameDAO{
         }  catch (DataAccessException e) {
 //            throw new RuntimeException(e);
         }
+        return null;
     }
 
     @Override
@@ -101,7 +102,22 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public ArrayList<GameData> listGames() throws DataAccessException {
-        return null;
+        ArrayList<GameData> games = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var query = "SELECT * FROM games ";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                var rs = preparedStatement.executeQuery();
+                while(rs.next())
+                {
+                    games.add(new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name")));
+                }
+            }
+        } catch (SQLException e) {
+//            throw new DataAccessException("Error: failed to connect to DB on findGame");
+        }  catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+        }
+        return games;
     }
 
     @Override
