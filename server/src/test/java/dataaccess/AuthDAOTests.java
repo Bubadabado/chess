@@ -55,4 +55,38 @@ public class AuthDAOTests {
             auths.getAuth("literally anything").authToken();
         });
     }
+
+    @Test
+    public void testDeleteAuthSuccess() {
+        reset();
+        var auths = new SQLAuthDAO();
+        var expected = "super secure auth";
+        try {
+            auths.createAuth(new AuthData(expected, "some user"));
+            auths.deleteAuth(expected);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            auths.getAuth(expected).authToken();
+        });
+    }
+    @Test
+    public void testDeleteAuthFailure() {
+        reset();
+        var auths = new SQLAuthDAO();
+        Assertions.assertDoesNotThrow(() -> {
+            auths.createAuth(new AuthData("some token", "some username"));
+            auths.deleteAuth("some token");
+        });
+    }
+
+    @Test
+    public void testClearAuthsSuccess() {
+        reset();
+        var auths = new SQLAuthDAO();
+        var actual = auths.clearAuths();
+        var expected = true;
+        Assertions.assertEquals(expected, actual);
+    }
 }

@@ -55,12 +55,14 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void clearAuths() {
+    public boolean clearAuths() {
         try (var conn = DatabaseManager.getConnection()) {
             var query = "DELETE FROM auths";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 var rs = preparedStatement.executeUpdate();
+                return true;
             }
         } catch (SQLException | DataAccessException e) {}
+        return false;
     }
 }
