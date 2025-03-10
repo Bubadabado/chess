@@ -35,7 +35,23 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public GameData findGame(int gameID) {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            var query = "SELECT * FROM games " +
+                    "WHERE id = ?";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setInt(1, gameID);
+                var rs = preparedStatement.executeQuery();
+                boolean empty = !rs.next();
+                if(empty) {
+                    return null;
+                }
+                return new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name"));
+            }
+        } catch (SQLException e) {
+//            throw new DataAccessException("Error: failed to connect to DB on findGame");
+        }  catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+        }
     }
 
     @Override
