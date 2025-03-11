@@ -88,6 +88,7 @@ public class DatabaseManager {
                 "white_username VARCHAR(255), " +
                 "black_username VARCHAR(255), " +
                 "name VARCHAR(255) NOT NULL, " +
+                "game TEXT, " +
                 "PRIMARY KEY (id) " +
                 ");";
         var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);

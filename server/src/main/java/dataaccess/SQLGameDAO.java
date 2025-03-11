@@ -12,12 +12,14 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public int createGame(String gameName) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var query = "INSERT INTO games (name) " +
-                    "VALUES(?)";
+            var json = new Gson().toJson(new ChessGame());
+            var query = "INSERT INTO games (name, game) " +
+                    "VALUES(?,?)";
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, gameName);
+                preparedStatement.setString(2, json);
                 //TODO: include game json
-                var json = new Gson().toJson(new ChessGame());
+
                 var rs = preparedStatement.executeUpdate();
                 query = "SELECT id FROM games WHERE name = ?";
                 try (var ps = conn.prepareStatement(query)) {
@@ -45,7 +47,10 @@ public class SQLGameDAO implements GameDAO{
                 if(empty) {
                     return null;
                 }
-                return new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name"));
+                var json = rs.getString("game");
+                System.out.println(json);
+                var game = new Gson().fromJson(json, ChessGame.class);
+                return new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name"), game);
             }
         } catch (SQLException e) {
 //            throw new DataAccessException("Error: failed to connect to DB on findGame");
@@ -109,9 +114,8 @@ public class SQLGameDAO implements GameDAO{
                 var rs = preparedStatement.executeQuery();
                 while(rs.next())
                 {
-                    System.out.println("found a game");
-                    System.out.println(rs.getInt("id"));
-                    games.add(new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name")));
+                    var game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                    games.add(new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name"), game));
                 }
             }
         } catch (SQLException e) {

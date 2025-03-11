@@ -3,7 +3,7 @@ package model;
 import chess.ChessGame;
 
 public record GameData(int gameID, String whiteUsername, String blackUsername,
-                       String gameName) {
+                       String gameName, ChessGame game) {
     public GameData addColor(String username, String playerColor) {
         return ((playerColor.equals("white")) ? addWhite(username) : addBlack(username));
     }
@@ -11,9 +11,9 @@ public record GameData(int gameID, String whiteUsername, String blackUsername,
         return ((playerColor.equals("white")) ? whiteUsername : blackUsername );
     }
     GameData addWhite(String username) {
-        return new GameData(gameID, username, blackUsername, gameName);
+        return new GameData(gameID, username, blackUsername, gameName, game);
     }
     GameData addBlack(String username) {
-        return new GameData(gameID, whiteUsername, username, gameName);
+        return new GameData(gameID, whiteUsername, username, gameName, game);
     }
 }
