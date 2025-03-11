@@ -18,8 +18,6 @@ public class SQLGameDAO implements GameDAO{
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, gameName);
                 preparedStatement.setString(2, json);
-                //TODO: include game json
-
                 var rs = preparedStatement.executeUpdate();
                 query = "SELECT id FROM games WHERE name = ?";
                 try (var ps = conn.prepareStatement(query)) {
