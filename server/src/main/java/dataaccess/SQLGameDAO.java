@@ -113,7 +113,10 @@ public class SQLGameDAO implements GameDAO{
                 while(rs.next())
                 {
                     var game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                    games.add(new GameData(rs.getInt("id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("name"), game));
+                    games.add(new GameData(rs.getInt("id"),
+                            rs.getString("white_username"),
+                            rs.getString("black_username"),
+                            rs.getString("name"), game));
                 }
             }
         } catch (SQLException e) {

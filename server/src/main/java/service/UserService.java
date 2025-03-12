@@ -29,8 +29,8 @@ public class UserService {
         var users = new SQLUserDAO();//MemoryUserDAO();
         var auths = new SQLAuthDAO();//MemoryAuthDAO();
         try {
-            //loginRequest.password().equals(users.getUser(loginRequest.username()).password())
-            if(users.getUser(loginRequest.username()) != null && BCrypt.checkpw(loginRequest.password(), users.getUser(loginRequest.username()).password())) {
+            if(users.getUser(loginRequest.username()) != null
+                    && BCrypt.checkpw(loginRequest.password(), users.getUser(loginRequest.username()).password())) {
                 var authData = new AuthData(AuthGen.generateAuthToken(), loginRequest.username());
                 auths.createAuth(authData);
                 return new LoginResult(authData.username(), authData.authToken());
