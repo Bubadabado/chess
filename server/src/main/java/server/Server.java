@@ -1,5 +1,7 @@
 package server;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import handler.AdminHandler;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -8,6 +10,11 @@ import spark.*;
 public class Server {
 
     public int run(int desiredPort) {
+        try {
+            DatabaseManager.initialize();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");

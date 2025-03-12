@@ -42,8 +42,8 @@ public class DatabaseManager {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
+                createTables();
             }
-            createTables();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -64,11 +64,8 @@ public class DatabaseManager {
                 "password VARCHAR(255) NOT NULL, " +
                 "email VARCHAR(255) NOT NULL, " +
                 "PRIMARY KEY (id) " +
-                ");";
-        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        }
+                ")";
+        runUpdate(statement);
     }
     static void createAuthsTable() throws SQLException {
         var statement = "CREATE TABLE IF NOT EXISTS auths ( " +
@@ -76,11 +73,8 @@ public class DatabaseManager {
                 "authtoken VARCHAR(255) NOT NULL, " +
                 "username VARCHAR(255) NOT NULL, " +
                 "PRIMARY KEY (id) " +
-                ");";
-        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        }
+                ")";
+        runUpdate(statement);
     }
     static void createGamesTable() throws SQLException {
         var statement = "CREATE TABLE IF NOT EXISTS games ( " +
@@ -90,10 +84,20 @@ public class DatabaseManager {
                 "name VARCHAR(255) NOT NULL, " +
                 "game TEXT, " +
                 "PRIMARY KEY (id) " +
-                ");";
-        var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+                ")";
+        runUpdate(statement);
+    }
+
+    static void runUpdate(String statement) throws SQLException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+                throw e;
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
