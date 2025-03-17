@@ -1,6 +1,7 @@
 package client;
 
 import java.util.Scanner;
+import ui.EscapeSequences;
 
 public class Repl {
     private final ChessClient client;
@@ -15,5 +16,20 @@ public class Repl {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        while (!result.equals("quit")) {
+            printInputPrompt();
+            try {
+                result = client.handleInput(scanner.nextLine());
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
+            } catch (Throwable e) {
+                System.out.print(e.toString());
+            }
+        }
+        System.out.println();
+    }
+
+    private void printInputPrompt() {
+        System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_RED
+                + ">>> " + EscapeSequences.SET_BG_COLOR_GREEN);
     }
 }
