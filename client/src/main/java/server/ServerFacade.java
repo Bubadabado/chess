@@ -23,11 +23,11 @@ public class ServerFacade {
     }
     public RegisterResult register(RegisterRequest request) throws Exception {
         var path = "/user";
-        System.out.println("facade register");
         return this.makeRequest("POST", path, request, RegisterResult.class);
     }
-    public LoginResult login(LoginRequest request) {
-        return null;//TODO
+    public LoginResult login(LoginRequest request) throws Exception {
+        var path = "/session";
+        return this.makeRequest("POST", path, request, LoginResult.class);
     }
 
 //    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {

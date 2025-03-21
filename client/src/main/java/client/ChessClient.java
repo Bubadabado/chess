@@ -43,10 +43,13 @@ public class ChessClient {
         if(params.length == 2) {
             var username = params[0];
             var pwd = params[1];
-            var response = server.login(new LoginRequest(username, pwd));
-            //TODO: serverfacade http request
-            isLoggedIn = true;
-            return String.format("You are logged in as %s.", response.username());
+            try {
+                var response = server.login(new LoginRequest(username, pwd));
+                isLoggedIn = true;
+                return String.format("You are logged in as %s.", response.username());
+            } catch (Exception e) {
+                return "TODO login throw 2 " + e.getMessage();
+            }
         }
         return "TODO login throw";
     }
@@ -57,11 +60,10 @@ public class ChessClient {
             var email = params[2];
             try {
                 var response = server.register(new RegisterRequest(username, pwd, email));
-                //TODO: serverfacade http request
                 isLoggedIn = true;
                 return String.format("Successfully registered and logged in as %s.", response.username());
             } catch (Exception e) {
-                return "TODO register throw 2";
+                return "TODO register throw 2 " + e.getMessage();
             }
         }
         return "TODO register throw";
