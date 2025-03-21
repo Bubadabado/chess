@@ -11,7 +11,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("How about a nice game of chess? Sign in to begin.");
+        System.out.println("How about a nice game of chess? Log in to begin.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -30,6 +30,6 @@ public class Repl {
 
     private void printInputPrompt() {
         System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_RED
-                + ">>> " + EscapeSequences.SET_BG_COLOR_GREEN);
+                + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 }

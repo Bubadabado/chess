@@ -1,6 +1,8 @@
 package client;
 
 import server.ServerFacade;
+import service.LoginRequest;
+import service.RegisterRequest;
 
 import java.util.Arrays;
 
@@ -8,6 +10,7 @@ public class ChessClient {
     private final ServerFacade server;
     private final String serverUrl;
     private boolean isLoggedIn;
+    private String user;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -24,7 +27,7 @@ public class ChessClient {
                 case "login" -> login(params);
                 case "register" -> register(params);
                 case "logout" -> logout();
-                case "createGame" -> createGame(params);
+                case "create" -> createGame(params);
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -37,10 +40,31 @@ public class ChessClient {
     }
 
     public String login(String... params) {
-        return "TODO login";
+        if(params.length == 2) {
+            var username = params[0];
+            var pwd = params[1];
+            var response = server.login(new LoginRequest(username, pwd));
+            //TODO: serverfacade http request
+            isLoggedIn = true;
+            return String.format("You are logged in as %s.", response.username());
+        }
+        return "TODO login throw";
     }
-    public String register(String... params) {
-        return "TODO register";
+    public String register(String... params) throws Exception {
+        if(params.length == 3) {
+            var username = params[0];
+            var pwd = params[1];
+            var email = params[2];
+            try {
+                var response = server.register(new RegisterRequest(username, pwd, email));
+                //TODO: serverfacade http request
+                isLoggedIn = true;
+                return String.format("Successfully registered and logged in as %s.", response.username());
+            } catch (Exception e) {
+                return "TODO register throw 2";
+            }
+        }
+        return "TODO register throw";
     }
     public String logout() {
         return "TODO logout";
@@ -59,7 +83,7 @@ public class ChessClient {
     }
 
     public String help() {
-        return ((isLoggedIn)
+        return ((!isLoggedIn)
                 ? """
                     - register <username> <password> <email>
                     - login <username> <password>
@@ -67,7 +91,7 @@ public class ChessClient {
                     - help
                     """
                 : """
-                    - createGame <name>
+                    - create <name>
                     - list
                     - join <id> [WHITE|BLACK]
                     - observe <id>

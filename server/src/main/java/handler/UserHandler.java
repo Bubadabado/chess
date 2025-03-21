@@ -8,6 +8,7 @@ import spark.Response;
 
 public class UserHandler {
     public static String handleRegister(Request req, Response res) {
+        System.out.println("Register called");
         var serializer = new Gson();
         String data = req.body();
         try {
