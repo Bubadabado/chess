@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.GameData;
 import service.*;
 
 import java.io.IOException;
@@ -42,9 +43,10 @@ public class ServerFacade {
         var path = "/game";
         return this.makeRequest("PUT", path, request, String.class, request.authToken());
     }
-    public String observeGame(JoinGameRequest request) throws Exception {
+    public GameData observeGame(JoinGameRequest request) throws Exception {
         var path = "/game";
-        return "TODO observe game server facade"; //this.makeRequest("PUT", path, request, String.class, request.authToken());
+        return this.makeRequest("GET", path, null, ListGameResult.class,
+                request.authToken()).games().get(request.gameID());
     }
 
 //    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {
@@ -123,7 +125,7 @@ private <T> T makeRequest(String method, String path, Object request, Class<T> r
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw new Exception("response error test");
+                    throw new Exception(respErr.toString());
 //                    throw ResponseException.fromJson(respErr);
                 }
             }

@@ -126,4 +126,76 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(board);
     }
+
+    public String toString(ChessGame.TeamColor team) {
+        StringBuilder boardString = new StringBuilder();
+        boardString.append(printRowHeader(team));
+        for(int row = 0; row < BOARD_SIZE; row++) {
+            boardString.append(printRow(((team == ChessGame.TeamColor.WHITE)
+                    ? row : BOARD_SIZE - 1 - row), team));
+        }
+        boardString.append(printRowHeader(team));
+        return boardString.toString();
+    }
+    private String printRowHeader(ChessGame.TeamColor team) {
+        StringBuilder rowString = new StringBuilder();
+        rowString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+        rowString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        rowString.append("   ");
+        for(int row = 0; row < BOARD_SIZE; row++) {
+            rowString.append(" ");
+            rowString.append((team == ChessGame.TeamColor.WHITE)
+                    ? (char)('a' + row)
+                    : (char)('h' - row)
+            );
+            rowString.append(" ");
+        }
+        rowString.append("   ");
+        rowString.append(EscapeSequences.RESET_BG_COLOR);
+        rowString.append("\n");
+        return rowString.toString();
+    }
+    private String printRow(int row, ChessGame.TeamColor team) {
+        StringBuilder rowString = new StringBuilder();
+        rowString.append(printRowCount(row));
+        for(int col = 0; col < BOARD_SIZE; col++) {
+            rowString.append(setBgColor(team, row, col));
+            var pos = new ChessPosition(row, ((team == ChessGame.TeamColor.WHITE)
+                ? col : BOARD_SIZE - 1 - col), true);
+            rowString.append(getPieceString(getPiece(pos)));
+        }
+        rowString.append(printRowCount(row));
+        rowString.append(EscapeSequences.RESET_BG_COLOR);
+        rowString.append("\n");
+        return rowString.toString();
+    }
+    private String printRowCount(int row) {
+        return EscapeSequences.SET_BG_COLOR_YELLOW
+                + " " + EscapeSequences.SET_TEXT_COLOR_BLACK + (BOARD_SIZE - row) + " ";
+    }
+    private String setBgColor(ChessGame.TeamColor team, int row, int col) {
+        return ((team == ChessGame.TeamColor.WHITE)
+                ? ((row % 2 == col % 2)
+                    ? EscapeSequences.SET_BG_COLOR_RED
+                    : EscapeSequences.SET_BG_COLOR_BLACK)
+                : ((row % 2 == col % 2)
+                    ? EscapeSequences.SET_BG_COLOR_BLACK
+                    : EscapeSequences.SET_BG_COLOR_RED)
+        );
+    }
+    private String getPieceString(ChessPiece piece) {
+        if (piece == null) { return "   "; }
+        var type = piece.getPieceType();
+        return ((piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                : EscapeSequences.SET_TEXT_COLOR_BLUE)
+        + switch (type) {
+            case ChessPiece.PieceType.KING -> " K "; //TODO color
+            case QUEEN -> " Q ";
+            case BISHOP -> " B ";
+            case KNIGHT -> " N ";
+            case ROOK -> " R ";
+            case PAWN -> " P ";
+        };
+    }
 }

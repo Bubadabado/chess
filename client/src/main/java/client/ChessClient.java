@@ -1,8 +1,12 @@
 package client;
 
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
 import service.*;
+import ui.EscapeSequences;
 
 import java.util.Arrays;
 
@@ -12,6 +16,8 @@ public class ChessClient {
     private boolean isLoggedIn;
     private String user;
     private String authToken;
+    private ChessGame game;
+    private String teamColor;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -83,6 +89,7 @@ public class ChessClient {
     public String logout() {
         try {
             var response = server.logout(new LogoutRequest(authToken));
+            //TODO: remove from current game
             isLoggedIn = false;
             return "Goodbye. \n" + help();
         } catch (Exception e) {
@@ -94,7 +101,7 @@ public class ChessClient {
             try {
                 var name = params[0];
                 var response = server.createGame(new CreateGameRequest(authToken, name));
-                return String.format("Successfully created game %s with id %s.", name, response.gameID());
+                return String.format("Successfully created game %s", name);
             } catch (Exception e) {
                 return "TODO create Game throw 2 " + e.getMessage();
             }
@@ -121,18 +128,33 @@ public class ChessClient {
     public String join(String... params) {
         if(params.length == 2) {
             try {
-                var id = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0])).gameID();
+                var targetGame = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
+                var id = targetGame.gameID();
                 var color = params[1];
                 var response = server.joinGame(new JoinGameRequest(authToken, color, id));
-                return "Successfully joined game";
+                game = targetGame.game();
+                teamColor = color;
+                return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
-                return "TODO create Game throw 2 " + e.getMessage();
+                return "TODO join Game throw 2 " + e.getMessage();
             }
         }
         return "TODO join throw";
     }
     public String observe(String... params) {
-        return "TODO observe";
+        if(params.length == 1) {
+            try {
+                var targetGame = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
+                var id = targetGame.gameID();
+                var response = server.observeGame(new JoinGameRequest(authToken, null, Integer.parseInt(params[0])));
+                game = targetGame.game();
+                teamColor = "white";
+                return "Observing game. \n" + printGame();
+            } catch (Exception e) {
+                return "TODO observe throw 2 " + e.getMessage();
+            }
+        }
+        return "TODO observe throw";
     }
 
     public String help() {
@@ -153,4 +175,26 @@ public class ChessClient {
                     """
         );
     }
+
+    public String printGame() {
+        return game.getBoard().toString((teamColor.equalsIgnoreCase("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK); //printRow();
+    }
+    private String printRow(int row) {
+        StringBuilder rowString = new StringBuilder();
+        for(int i = 0; i < 8; i++) {
+            rowString.append(switch (game.getBoard().getPiece(new ChessPosition(row, i, true)).getPieceType()) {
+                case ChessPiece.PieceType.KING -> "K"; //TODO color
+                case QUEEN -> "Q";
+                case BISHOP -> "B";
+                case KNIGHT -> "N";
+                case ROOK -> "R";
+                case PAWN -> "P";
+                default -> "  ";
+            });
+        }
+        return EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.SET_TEXT_COLOR_WHITE 
+                + rowString + "\n";
+    }
+
+    public boolean getLoginState() { return isLoggedIn; }
 }
