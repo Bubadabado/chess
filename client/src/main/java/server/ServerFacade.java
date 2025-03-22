@@ -28,19 +28,19 @@ public class ServerFacade {
     }
     public String logout(LogoutRequest request) throws Exception {
         var path = "/session";
-        return this.makeRequest("DELETE", path, request, String.class);
+        return this.makeRequest("DELETE", path, request, String.class, request.authToken());
     }
     public CreateGameResult createGame(CreateGameRequest request) throws Exception {
         var path = "/game";
-        return this.makeRequest("POST", path, request, CreateGameResult.class);
+        return this.makeRequest("POST", path, request, CreateGameResult.class, request.authToken());
     }
     public ListGameResult listGames(ListGameRequest request) throws Exception {
         var path = "/game";
-        return this.makeRequest("GET", path, request, ListGameResult.class);
+        return this.makeRequest("GET", path, request, ListGameResult.class, request.authToken());
     }
     public String joinGame(JoinGameRequest request) throws Exception {
         var path = "/game";
-        return this.makeRequest("PUT", path, request, String.class);
+        return this.makeRequest("PUT", path, request, String.class, request.authToken());
     }
 
 //    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {
@@ -84,6 +84,25 @@ private <T> T makeRequest(String method, String path, Object request, Class<T> r
 //        throw new ResponseException(500, ex.getMessage());
 //    }
 }
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String auth) throws Exception {
+        try {
+            URL url = (new URI(serverUrl + path)).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestProperty("Authorization", auth);
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+
+            writeBody(request, http);
+            http.connect();
+            throwIfNotSuccessful(http);
+            return readBody(http, responseClass);
+        } catch (Exception ex) {
+            throw ex;
+        }
+//    } catch (Exception ex) {
+//        throw new ResponseException(500, ex.getMessage());
+//    }
+    }
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
