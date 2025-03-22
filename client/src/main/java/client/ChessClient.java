@@ -1,10 +1,7 @@
 package client;
 
 import server.ServerFacade;
-import service.CreateGameRequest;
-import service.LoginRequest;
-import service.LogoutRequest;
-import service.RegisterRequest;
+import service.*;
 
 import java.util.Arrays;
 
@@ -105,7 +102,12 @@ public class ChessClient {
         return "TODO create Game throw";
     }
     public String list() {
-        return "TODO list";
+        try {
+            var response = server.listGames(new ListGameRequest(authToken));
+            return "TODO format list response";//String.format("Successfully created game %s with id %s.", name, response.gameID());
+        } catch (Exception e) {
+            return "TODO list throw " + e.getMessage();
+        }
     }
     public String join(String... params) {
         return "TODO join";
