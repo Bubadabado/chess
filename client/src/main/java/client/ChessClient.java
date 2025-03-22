@@ -1,5 +1,6 @@
 package client;
 
+import model.GameData;
 import server.ServerFacade;
 import service.*;
 
@@ -81,10 +82,9 @@ public class ChessClient {
     }
     public String logout() {
         try {
-            System.out.println(authToken);
             var response = server.logout(new LogoutRequest(authToken));
             isLoggedIn = false;
-            return "Goodbye.";
+            return "Goodbye. \n" + help();
         } catch (Exception e) {
             return "TODO logout throw 2 " + e.getMessage();
         }
@@ -104,13 +104,32 @@ public class ChessClient {
     public String list() {
         try {
             var response = server.listGames(new ListGameRequest(authToken));
-            return "TODO format list response";//String.format("Successfully created game %s with id %s.", name, response.gameID());
+            StringBuilder result = new StringBuilder();
+            int i = 0;
+            for(GameData game : response.games()) {
+                result.append(i);
+                result.append(": ");
+                result.append(game.gameName());
+                result.append("\n");
+                i++;
+            }
+            return result.toString();
         } catch (Exception e) {
             return "TODO list throw " + e.getMessage();
         }
     }
     public String join(String... params) {
-        return "TODO join";
+        if(params.length == 2) {
+            try {
+                var id = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0])).gameID();
+                var color = params[1];
+                var response = server.joinGame(new JoinGameRequest(authToken, color, id));
+                return "Successfully joined game";
+            } catch (Exception e) {
+                return "TODO create Game throw 2 " + e.getMessage();
+            }
+        }
+        return "TODO join throw";
     }
     public String observe(String... params) {
         return "TODO observe";

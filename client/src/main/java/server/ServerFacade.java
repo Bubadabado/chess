@@ -42,6 +42,10 @@ public class ServerFacade {
         var path = "/game";
         return this.makeRequest("PUT", path, request, String.class, request.authToken());
     }
+    public String observeGame(JoinGameRequest request) throws Exception {
+        var path = "/game";
+        return "TODO observe game server facade"; //this.makeRequest("PUT", path, request, String.class, request.authToken());
+    }
 
 //    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {
 //        try {
