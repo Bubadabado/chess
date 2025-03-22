@@ -1,7 +1,9 @@
 package client;
 
 import server.ServerFacade;
+import service.CreateGameRequest;
 import service.LoginRequest;
+import service.LogoutRequest;
 import service.RegisterRequest;
 
 import java.util.Arrays;
@@ -11,6 +13,7 @@ public class ChessClient {
     private final String serverUrl;
     private boolean isLoggedIn;
     private String user;
+    private String authToken;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -23,17 +26,24 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "login" -> login(params);
-                case "register" -> register(params);
-                case "logout" -> logout();
-                case "create" -> createGame(params);
-                case "list" -> list();
-                case "join" -> join(params);
-                case "observe" -> observe(params);
-                case "quit" -> "quit";
-                default -> help();
-            };
+            if(isLoggedIn) {
+                return switch (cmd) {
+                    case "logout" -> logout();
+                    case "create" -> createGame(params);
+                    case "list" -> list();
+                    case "join" -> join(params);
+                    case "observe" -> observe(params);
+                    default -> help();
+                };
+            } else {
+                return switch (cmd) {
+                    case "login" -> login(params);
+                    case "register" -> register(params);
+                    case "quit" -> "quit";
+                    default -> help();
+                };
+            }
+
         } catch (Exception ex) {
             return ex.getMessage();
         }
@@ -46,6 +56,8 @@ public class ChessClient {
             try {
                 var response = server.login(new LoginRequest(username, pwd));
                 isLoggedIn = true;
+                user = response.username();
+                authToken = response.authToken();
                 return String.format("You are logged in as %s.", response.username());
             } catch (Exception e) {
                 return "TODO login throw 2 " + e.getMessage();
@@ -61,6 +73,8 @@ public class ChessClient {
             try {
                 var response = server.register(new RegisterRequest(username, pwd, email));
                 isLoggedIn = true;
+                user = response.username();
+                authToken = response.authToken();
                 return String.format("Successfully registered and logged in as %s.", response.username());
             } catch (Exception e) {
                 return "TODO register throw 2 " + e.getMessage();
@@ -69,10 +83,26 @@ public class ChessClient {
         return "TODO register throw";
     }
     public String logout() {
-        return "TODO logout";
+        try {
+            System.out.println(authToken);
+            var response = server.logout(new LogoutRequest(authToken));
+            isLoggedIn = false;
+            return "Goodbye.";
+        } catch (Exception e) {
+            return "TODO logout throw 2 " + e.getMessage();
+        }
     }
     public String createGame(String... params) {
-        return "TODO createGame";
+        if(params.length == 1) {
+            try {
+                var name = params[0];
+                var response = server.createGame(new CreateGameRequest(authToken, name));
+                return String.format("Successfully created game %s with id %s.", name, response.gameID());
+            } catch (Exception e) {
+                return "TODO create Game throw 2 " + e.getMessage();
+            }
+        }
+        return "TODO create Game throw";
     }
     public String list() {
         return "TODO list";

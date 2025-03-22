@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import service.LoginRequest;
-import service.LoginResult;
-import service.RegisterRequest;
-import service.RegisterResult;
+import service.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +25,22 @@ public class ServerFacade {
     public LoginResult login(LoginRequest request) throws Exception {
         var path = "/session";
         return this.makeRequest("POST", path, request, LoginResult.class);
+    }
+    public String logout(LogoutRequest request) throws Exception {
+        var path = "/session";
+        return this.makeRequest("DELETE", path, request, String.class);
+    }
+    public CreateGameResult createGame(CreateGameRequest request) throws Exception {
+        var path = "/game";
+        return this.makeRequest("POST", path, request, CreateGameResult.class);
+    }
+    public ListGameResult listGames(ListGameRequest request) throws Exception {
+        var path = "/game";
+        return this.makeRequest("GET", path, request, ListGameResult.class);
+    }
+    public String joinGame(JoinGameRequest request) throws Exception {
+        var path = "/game";
+        return this.makeRequest("PUT", path, request, String.class);
     }
 
 //    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {
