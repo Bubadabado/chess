@@ -127,6 +127,11 @@ public class ChessBoard {
         return Arrays.deepHashCode(board);
     }
 
+    /**
+     * Print and format the board
+     * @param team
+     * @return
+     */
     public String toString(ChessGame.TeamColor team) {
         StringBuilder boardString = new StringBuilder();
         boardString.append(printRowHeader(team));
@@ -190,7 +195,7 @@ public class ChessBoard {
                 ? EscapeSequences.SET_TEXT_COLOR_WHITE
                 : EscapeSequences.SET_TEXT_COLOR_BLUE)
         + switch (type) {
-            case ChessPiece.PieceType.KING -> " K "; //TODO color
+            case ChessPiece.PieceType.KING -> " K ";
             case QUEEN -> " Q ";
             case BISHOP -> " B ";
             case KNIGHT -> " N ";

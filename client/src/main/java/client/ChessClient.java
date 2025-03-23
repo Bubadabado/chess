@@ -49,12 +49,13 @@ public class ChessClient {
             }
 
         } catch (Exception ex) {
-            return ex.getMessage();
+            return "Invalid input. Please try again.";//ex.getMessage();
         }
     }
 
     public String login(String... params) {
-        if(params.length == 2) {
+        int numParams = 2;
+        if(params.length == numParams) {
             var username = params[0];
             var pwd = params[1];
             try {
@@ -64,13 +65,14 @@ public class ChessClient {
                 authToken = response.authToken();
                 return String.format("You are logged in as %s.", response.username());
             } catch (Exception e) {
-                return "TODO login throw 2 " + e.getMessage();
+                return "Login failed. Please check your password and try again.";// + e.getMessage();
             }
         }
-        return "TODO login throw";
+        return "Login failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String register(String... params) throws Exception {
-        if(params.length == 3) {
+        int numParams = 3;
+        if(params.length == numParams) {
             var username = params[0];
             var pwd = params[1];
             var email = params[2];
@@ -81,10 +83,10 @@ public class ChessClient {
                 authToken = response.authToken();
                 return String.format("Successfully registered and logged in as %s.", response.username());
             } catch (Exception e) {
-                return "TODO register throw 2 " + e.getMessage();
+                return "Register failed. Username taken.";// + e.getMessage();
             }
         }
-        return "TODO register throw";
+        return "Register failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String logout() {
         try {
@@ -96,16 +98,17 @@ public class ChessClient {
         }
     }
     public String createGame(String... params) {
-        if(params.length == 1) {
+        int numParams = 1;
+        if(params.length == numParams) {
             try {
                 var name = params[0];
                 var response = server.createGame(new CreateGameRequest(authToken, name));
                 return String.format("Successfully created game %s", name);
             } catch (Exception e) {
-                return "TODO create Game throw 2 " + e.getMessage();
+                return "Create failed.";// + e.getMessage();
             }
         }
-        return "TODO create Game throw";
+        return "Create failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String list() {
         try {
@@ -121,13 +124,15 @@ public class ChessClient {
             }
             return result.toString();
         } catch (Exception e) {
-            return "TODO list throw " + e.getMessage();
+            return "Failed to list games.";// + e.getMessage();
         }
     }
     public String join(String... params) {
-        if(params.length == 2) {
+        int numParams = 2;
+        if(params.length == numParams) {
             try {
-                var targetGame = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
+                var targetGame = server.listGames(
+                        new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
                 var id = targetGame.gameID();
                 var color = params[1];
                 var response = server.joinGame(new JoinGameRequest(authToken, color, id));
@@ -135,25 +140,28 @@ public class ChessClient {
                 teamColor = color;
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
-                return "TODO join Game throw 2 " + e.getMessage();
+                return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
             }
         }
-        return "TODO join throw";
+        return "Join failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String observe(String... params) {
-        if(params.length == 1) {
+        int numParams = 1;
+        if(params.length == numParams) {
             try {
-                var targetGame = server.listGames(new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
+                var targetGame = server.listGames(
+                        new ListGameRequest(authToken)).games().get(Integer.parseInt(params[0]));
                 var id = targetGame.gameID();
-                var response = server.observeGame(new JoinGameRequest(authToken, null, Integer.parseInt(params[0])));
+                var response = server.observeGame(
+                        new JoinGameRequest(authToken, null, Integer.parseInt(params[0])));
                 game = targetGame.game();
                 teamColor = "white";
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
-                return "TODO observe throw 2 " + e.getMessage();
+                return "Failed to observe game. Invalid id. ";// + e.getMessage();
             }
         }
-        return "TODO observe throw";
+        return "Observe failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
 
     public String help() {
@@ -176,24 +184,10 @@ public class ChessClient {
     }
 
     public String printGame() {
-        return game.getBoard().toString((teamColor.equalsIgnoreCase("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK); //printRow();
+        return game.getBoard().toString((teamColor.equalsIgnoreCase("white"))
+                ? ChessGame.TeamColor.WHITE
+                : ChessGame.TeamColor.BLACK
+        );
     }
-    private String printRow(int row) {
-        StringBuilder rowString = new StringBuilder();
-        for(int i = 0; i < 8; i++) {
-            rowString.append(switch (game.getBoard().getPiece(new ChessPosition(row, i, true)).getPieceType()) {
-                case ChessPiece.PieceType.KING -> "K";
-                case QUEEN -> "Q";
-                case BISHOP -> "B";
-                case KNIGHT -> "N";
-                case ROOK -> "R";
-                case PAWN -> "P";
-                default -> "  ";
-            });
-        }
-        return EscapeSequences.SET_BG_COLOR_RED + EscapeSequences.SET_TEXT_COLOR_WHITE 
-                + rowString + "\n";
-    }
-
     public boolean getLoginState() { return isLoggedIn; }
 }

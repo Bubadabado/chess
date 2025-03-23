@@ -19,6 +19,8 @@ public class ServerFacade {
     public ServerFacade(String url) {
         serverUrl = url;
     }
+
+    //facade endpoints
     public RegisterResult register(RegisterRequest request) throws Exception {
         var path = "/user";
         return this.makeRequest("POST", path, request, RegisterResult.class);
@@ -53,6 +55,7 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, Object.class);
     }
 
+    //make an http request
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -68,6 +71,7 @@ public class ServerFacade {
             throw ex;
         }
     }
+    //http request with auth and headers
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String auth) throws Exception {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
