@@ -3,7 +3,7 @@ package chess;
 /**
  * This class contains constants and functions relating to ANSI Escape Sequences that are useful in the Client display
  */
-public class EscapeSequences {
+public class EscapeSequencesShared {
 
     private static final String UNICODE_ESCAPE = "\u001b";
     private static final String ANSI_ESCAPE = "\033";

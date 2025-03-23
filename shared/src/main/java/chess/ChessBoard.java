@@ -3,7 +3,6 @@ package chess;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.lang.Iterable;
 
 import static java.util.Arrays.asList;
 
@@ -144,8 +143,8 @@ public class ChessBoard {
     }
     private String printRowHeader(ChessGame.TeamColor team) {
         StringBuilder rowString = new StringBuilder();
-        rowString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
-        rowString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        rowString.append(EscapeSequencesShared.SET_BG_COLOR_YELLOW);
+        rowString.append(EscapeSequencesShared.SET_TEXT_COLOR_BLACK);
         rowString.append("   ");
         for(int row = 0; row < BOARD_SIZE; row++) {
             rowString.append(" ");
@@ -156,7 +155,7 @@ public class ChessBoard {
             rowString.append(" ");
         }
         rowString.append("   ");
-        rowString.append(EscapeSequences.RESET_BG_COLOR);
+        rowString.append(EscapeSequencesShared.RESET_BG_COLOR);
         rowString.append("\n");
         return rowString.toString();
     }
@@ -170,30 +169,30 @@ public class ChessBoard {
             rowString.append(getPieceString(getPiece(pos)));
         }
         rowString.append(printRowCount(row));
-        rowString.append(EscapeSequences.RESET_BG_COLOR);
+        rowString.append(EscapeSequencesShared.RESET_BG_COLOR);
         rowString.append("\n");
         return rowString.toString();
     }
     private String printRowCount(int row) {
-        return EscapeSequences.SET_BG_COLOR_YELLOW
-                + " " + EscapeSequences.SET_TEXT_COLOR_BLACK + (BOARD_SIZE - row) + " ";
+        return EscapeSequencesShared.SET_BG_COLOR_YELLOW
+                + " " + EscapeSequencesShared.SET_TEXT_COLOR_BLACK + (BOARD_SIZE - row) + " ";
     }
     private String setBgColor(ChessGame.TeamColor team, int row, int col) {
         return ((team == ChessGame.TeamColor.WHITE)
                 ? ((row % 2 == col % 2)
-                    ? EscapeSequences.SET_BG_COLOR_RED
-                    : EscapeSequences.SET_BG_COLOR_BLACK)
+                    ? EscapeSequencesShared.SET_BG_COLOR_RED
+                    : EscapeSequencesShared.SET_BG_COLOR_BLACK)
                 : ((row % 2 == col % 2)
-                    ? EscapeSequences.SET_BG_COLOR_BLACK
-                    : EscapeSequences.SET_BG_COLOR_RED)
+                    ? EscapeSequencesShared.SET_BG_COLOR_BLACK
+                    : EscapeSequencesShared.SET_BG_COLOR_RED)
         );
     }
     private String getPieceString(ChessPiece piece) {
         if (piece == null) { return "   "; }
         var type = piece.getPieceType();
         return ((piece.getTeamColor() == ChessGame.TeamColor.WHITE)
-                ? EscapeSequences.SET_TEXT_COLOR_WHITE
-                : EscapeSequences.SET_TEXT_COLOR_BLUE)
+                ? EscapeSequencesShared.SET_TEXT_COLOR_WHITE
+                : EscapeSequencesShared.SET_TEXT_COLOR_BLUE)
         + switch (type) {
             case ChessPiece.PieceType.KING -> " K ";
             case QUEEN -> " Q ";
