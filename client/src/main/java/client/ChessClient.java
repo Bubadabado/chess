@@ -1,12 +1,9 @@
 package client;
 
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
 import service.*;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 
