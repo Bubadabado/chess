@@ -48,48 +48,26 @@ public class ServerFacade {
         return this.makeRequest("GET", path, null, ListGameResult.class,
                 request.authToken()).games().get(request.gameID());
     }
-
-//    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {//throws ResponseException {
-//        try {
-//            URL url = (new URI(serverUrl + path)).toURL();
-//            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-//            http.setRequestMethod(method);
-//            http.setDoOutput(true);
-//
-//            //writeBody(request, http); //TODO
-//            http.connect();
-//            //throwIfNotSuccessful(http);
-//        // Output the response body
-//            try (InputStream respBody = http.getInputStream()) {
-//                InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-//                System.out.println(new Gson().fromJson(inputStreamReader, Map.class));
-//            }
-////            return readBody(http, responseClass);
-////        } catch (ResponseException ex) {
-////            throw ex;
-//        } catch (Exception ex) {
-////            throw new ResponseException(500, ex.getMessage());
-//        }
-//        return null; //TODO
-//    }
-private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
-    try {
-        URL url = (new URI(serverUrl + path)).toURL();
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod(method);
-        http.setDoOutput(true);
-
-        writeBody(request, http);
-        http.connect();
-        throwIfNotSuccessful(http);
-        return readBody(http, responseClass);
-    } catch (Exception ex) {
-        throw ex;
+    public void clear() throws Exception {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, Object.class);
     }
-//    } catch (Exception ex) {
-//        throw new ResponseException(500, ex.getMessage());
-//    }
-}
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
+        try {
+            URL url = (new URI(serverUrl + path)).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+
+            writeBody(request, http);
+            http.connect();
+            throwIfNotSuccessful(http);
+            return readBody(http, responseClass);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String auth) throws Exception {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -105,9 +83,6 @@ private <T> T makeRequest(String method, String path, Object request, Class<T> r
         } catch (Exception ex) {
             throw ex;
         }
-//    } catch (Exception ex) {
-//        throw new ResponseException(500, ex.getMessage());
-//    }
     }
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
@@ -126,11 +101,9 @@ private <T> T makeRequest(String method, String path, Object request, Class<T> r
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
                     throw new Exception(respErr.toString());
-//                    throw ResponseException.fromJson(respErr);
                 }
             }
             throw new Exception("other failure: " + status);
-//            throw new ResponseException(status, "other failure: " + status);
         }
     }
 

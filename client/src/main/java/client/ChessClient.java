@@ -89,7 +89,6 @@ public class ChessClient {
     public String logout() {
         try {
             var response = server.logout(new LogoutRequest(authToken));
-            //TODO: remove from current game
             isLoggedIn = false;
             return "Goodbye. \n" + help();
         } catch (Exception e) {
@@ -183,7 +182,7 @@ public class ChessClient {
         StringBuilder rowString = new StringBuilder();
         for(int i = 0; i < 8; i++) {
             rowString.append(switch (game.getBoard().getPiece(new ChessPosition(row, i, true)).getPieceType()) {
-                case ChessPiece.PieceType.KING -> "K"; //TODO color
+                case ChessPiece.PieceType.KING -> "K";
                 case QUEEN -> "Q";
                 case BISHOP -> "B";
                 case KNIGHT -> "N";
