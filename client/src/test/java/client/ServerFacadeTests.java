@@ -3,10 +3,7 @@ package client;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
-import service.CreateGameRequest;
-import service.LoginRequest;
-import service.LogoutRequest;
-import service.RegisterRequest;
+import service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,6 +83,20 @@ public class ServerFacadeTests {
     public void testCreateFailure() throws Exception {
         assertThrows(Exception.class, () -> {
             var res = facade.createGame(new CreateGameRequest("no auth", "game1"));
+        });
+    }
+
+    @Test
+    public void testListSuccess() throws Exception {
+        var res = facade.register(new RegisterRequest("un", "pw", "em"));
+        assertDoesNotThrow(() -> {
+            facade.listGames(new ListGameRequest(res.authToken()));
+        });
+    }
+    @Test
+    public void testListFailure() throws Exception {
+        assertThrows(Exception.class, () -> {
+            var res = facade.listGames(new ListGameRequest("no auth"));
         });
     }
 }
