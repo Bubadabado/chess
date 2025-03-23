@@ -99,4 +99,36 @@ public class ServerFacadeTests {
             var res = facade.listGames(new ListGameRequest("no auth"));
         });
     }
+
+    @Test
+    public void testJoinSuccess() throws Exception {
+        var res = facade.register(new RegisterRequest("un", "pw", "em"));
+        assertDoesNotThrow(() -> {
+            var game = facade.createGame(new CreateGameRequest(res.authToken(), "game1"));
+            facade.joinGame(new JoinGameRequest(res.authToken(), "BLACK", game.gameID()));
+        });
+    }
+    @Test
+    public void testJoinFailure() throws Exception {
+        var res = facade.register(new RegisterRequest("un", "pw", "em"));
+        assertThrows(Exception.class, () -> {
+            facade.joinGame(new JoinGameRequest(res.authToken(), "BLACK", 0));
+        });
+    }
+
+    @Test
+    public void testObserveSuccess() throws Exception {
+        var res = facade.register(new RegisterRequest("un", "pw", "em"));
+        assertDoesNotThrow(() -> {
+            var game = facade.createGame(new CreateGameRequest(res.authToken(), "game1"));
+            facade.observeGame(new JoinGameRequest(res.authToken(), null, 0));
+        });
+    }
+    @Test
+    public void testObserveFailure() throws Exception {
+        var res = facade.register(new RegisterRequest("un", "pw", "em"));
+        assertThrows(Exception.class, () -> {
+            facade.observeGame(new JoinGameRequest(res.authToken(), "BLACK", 0));
+        });
+    }
 }
