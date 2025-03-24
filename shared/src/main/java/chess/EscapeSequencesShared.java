@@ -5,24 +5,24 @@ package chess;
  */
 public class EscapeSequencesShared {
 
-    private static final String UNICODE_ESCAPE = "\u001b";
+    private static final String UNICODE_ESCAPE_S = "\u001b";
     private static final String ANSI_ESCAPE = "\033";
 
-    public static final String ERASE_SCREEN = UNICODE_ESCAPE + "[H" + UNICODE_ESCAPE + "[2J";
-    public static final String ERASE_LINE = UNICODE_ESCAPE + "[2K";
+    public static final String ERASE_SCREEN = UNICODE_ESCAPE_S + "[H" + UNICODE_ESCAPE_S + "[2J";
+    public static final String ERASE_LINE = UNICODE_ESCAPE_S + "[2K";
 
-    public static final String SET_TEXT_BOLD = UNICODE_ESCAPE + "[1m";
-    public static final String SET_TEXT_FAINT = UNICODE_ESCAPE + "[2m";
-    public static final String RESET_TEXT_BOLD_FAINT = UNICODE_ESCAPE + "[22m";
-    public static final String SET_TEXT_ITALIC = UNICODE_ESCAPE + "[3m";
-    public static final String RESET_TEXT_ITALIC = UNICODE_ESCAPE + "[23m";
-    public static final String SET_TEXT_UNDERLINE = UNICODE_ESCAPE + "[4m";
-    public static final String RESET_TEXT_UNDERLINE = UNICODE_ESCAPE + "[24m";
-    public static final String SET_TEXT_BLINKING = UNICODE_ESCAPE + "[5m";
-    public static final String RESET_TEXT_BLINKING = UNICODE_ESCAPE + "[25m";
+    public static final String SET_TEXT_BOLD = UNICODE_ESCAPE_S + "[1m";
+    public static final String SET_TEXT_FAINT = UNICODE_ESCAPE_S + "[2m";
+    public static final String RESET_TEXT_BOLD_FAINT = UNICODE_ESCAPE_S + "[22m";
+    public static final String SET_TEXT_ITALIC = UNICODE_ESCAPE_S + "[3m";
+    public static final String RESET_TEXT_ITALIC = UNICODE_ESCAPE_S + "[23m";
+    public static final String SET_TEXT_UNDERLINE = UNICODE_ESCAPE_S + "[4m";
+    public static final String RESET_TEXT_UNDERLINE = UNICODE_ESCAPE_S + "[24m";
+    public static final String SET_TEXT_BLINKING = UNICODE_ESCAPE_S + "[5m";
+    public static final String RESET_TEXT_BLINKING = UNICODE_ESCAPE_S + "[25m";
 
-    private static final String SET_TEXT_COLOR = UNICODE_ESCAPE + "[38;5;";
-    private static final String SET_BG_COLOR = UNICODE_ESCAPE + "[48;5;";
+    private static final String SET_TEXT_COLOR = UNICODE_ESCAPE_S + "[38;5;";
+    private static final String SET_BG_COLOR = UNICODE_ESCAPE_S + "[48;5;";
 
     public static final String SET_TEXT_COLOR_BLACK = SET_TEXT_COLOR + "0m";
     public static final String SET_TEXT_COLOR_LIGHT_GREY = SET_TEXT_COLOR + "242m";
@@ -33,7 +33,7 @@ public class EscapeSequencesShared {
     public static final String SET_TEXT_COLOR_BLUE = SET_TEXT_COLOR + "12m";
     public static final String SET_TEXT_COLOR_MAGENTA = SET_TEXT_COLOR + "5m";
     public static final String SET_TEXT_COLOR_WHITE = SET_TEXT_COLOR + "15m";
-    public static final String RESET_TEXT_COLOR = UNICODE_ESCAPE + "[39m";
+    public static final String RESET_TEXT_COLOR = UNICODE_ESCAPE_S + "[39m";
 
     public static final String SET_BG_COLOR_BLACK = SET_BG_COLOR + "0m";
     public static final String SET_BG_COLOR_LIGHT_GREY = SET_BG_COLOR + "242m";
@@ -45,7 +45,7 @@ public class EscapeSequencesShared {
     public static final String SET_BG_COLOR_BLUE = SET_BG_COLOR + "12m";
     public static final String SET_BG_COLOR_MAGENTA = SET_BG_COLOR + "5m";
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
-    public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
+    public static final String RESET_BG_COLOR = UNICODE_ESCAPE_S + "[49m";
 
     public static final String WHITE_KING = " ♔ ";
     public static final String WHITE_QUEEN = " ♕ ";
@@ -61,5 +61,5 @@ public class EscapeSequencesShared {
     public static final String BLACK_PAWN = " ♟ ";
     public static final String EMPTY = " \u2003 ";
 
-    public static String moveCursorToLocation(int x, int y) { return UNICODE_ESCAPE + "[" + y + ";" + x + "H"; }
+    public static String moveCursorToLocation(int x, int y) { return UNICODE_ESCAPE_S + "[" + y + ";" + x + "H"; }
 }
