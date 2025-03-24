@@ -91,7 +91,7 @@ public class ChessClient {
             isLoggedIn = false;
             return "Goodbye. \n" + help();
         } catch (Exception e) {
-            return "TODO logout throw 2 " + e.getMessage();
+            return "Logout failed.";// + e.getMessage();
         }
     }
     public String createGame(String... params) {
