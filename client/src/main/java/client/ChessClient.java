@@ -110,12 +110,19 @@ public class ChessClient {
     public String list() {
         try {
             var response = server.listGames(new ListGameRequest(authToken));
+            if (response.games().isEmpty()) {
+                return  "There are no current games.";
+            }
             StringBuilder result = new StringBuilder();
             int i = 0;
             for(GameData game : response.games()) {
                 result.append(i);
                 result.append(": ");
                 result.append(game.gameName());
+                result.append(" - White: ");
+                result.append((game.whiteUsername() == null) ? "(empty)" : game.whiteUsername());
+                result.append(", Black: ");
+                result.append((game.blackUsername() == null) ? "(empty)" : game.blackUsername());
                 result.append("\n");
                 i++;
             }
