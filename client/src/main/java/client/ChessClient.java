@@ -15,11 +15,13 @@ public class ChessClient {
     private String authToken;
     private ChessGame game;
     private String teamColor;
+    private boolean isInGame;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         isLoggedIn = false;
+        isInGame = false;
     }
 
     public String handleInput(String input) {
@@ -27,7 +29,16 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            if(isLoggedIn) {
+            if(isInGame) {
+                return switch (cmd) {
+                    case "redraw" -> printGame();
+                    case "leave" -> leaveGame();
+                    case "move" -> makeMove(params);
+                    case "resign" -> resign();
+                    case "highlight" -> highlight(params);
+                    default -> help();
+                };
+            } else if(isLoggedIn) {
                 return switch (cmd) {
                     case "logout" -> logout();
                     case "create" -> createGame(params);
@@ -89,6 +100,8 @@ public class ChessClient {
         try {
             var response = server.logout(new LogoutRequest(authToken));
             isLoggedIn = false;
+            //TODO: leave game
+            isInGame = false;
             return "Goodbye. \n" + help();
         } catch (Exception e) {
             return "Logout failed.";// + e.getMessage();
@@ -142,6 +155,7 @@ public class ChessClient {
                 var response = server.joinGame(new JoinGameRequest(authToken, color, id));
                 game = targetGame.game();
                 teamColor = color;
+                isInGame = true;
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
@@ -169,22 +183,31 @@ public class ChessClient {
     }
 
     public String help() {
-        return ((!isLoggedIn)
-                ? """
-                    - register <username> <password> <email>
-                    - login <username> <password>
-                    - quit
+        return ((isInGame)
+                ?  """
+                    - redraw
+                    - leave
+                    - move <space> <moveto>
+                    - resign
+                    - highlight <space>
                     - help
                     """
-                : """
-                    - create <name>
-                    - list
-                    - join <id> [WHITE|BLACK]
-                    - observe <id>
-                    - logout
-                    - help
-                    """
-        );
+                : ((isLoggedIn)
+                    ?  """
+                        - create <name>
+                        - list
+                        - join <id> [WHITE|BLACK]
+                        - observe <id>
+                        - logout
+                        - help
+                        """
+                    : """
+                        - register <username> <password> <email>
+                        - login <username> <password>
+                        - quit
+                        - help
+                        """
+        ));
     }
 
     public String printGame() {
@@ -193,5 +216,55 @@ public class ChessClient {
                 : ChessGame.TeamColor.BLACK
         );
     }
+    public String redraw() {
+        try {
+            return printGame();
+        } catch (Exception e) {
+            return "Redraw failed.";// + e.getMessage();
+        }
+    }
+    public String leaveGame() {
+        try {
+            return "todo leave game";
+        } catch (Exception e) {
+            return "leave failed.";// + e.getMessage();
+        }
+    }
+    public String makeMove(String... params) {
+        int numParams = 2;
+        if(params.length == numParams) {
+            try {
+//                var name = params[0];
+//                var response = server.createGame(new CreateGameRequest(authToken, name));
+//                return String.format("Successfully created game %s", name);
+                return "TODO make move";
+            } catch (Exception e) {
+                return "Make move failed.";// + e.getMessage();
+            }
+        }
+        return "Make move failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
+    }
+    public String resign() {
+        try {
+            return "todo resign";
+        } catch (Exception e) {
+            return "Resign failed.";// + e.getMessage();
+        }
+    }
+    public String highlight(String... params) {
+        int numParams = 1;
+        if(params.length == numParams) {
+            try {
+//                var name = params[0];
+//                var response = server.createGame(new CreateGameRequest(authToken, name));
+//                return String.format("Successfully created game %s", name);
+                return "TODO highlight";
+            } catch (Exception e) {
+                return "Highlight failed.";// + e.getMessage();
+            }
+        }
+        return "Highlight failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
+    }
+
     public boolean getLoginState() { return isLoggedIn; }
 }
