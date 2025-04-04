@@ -1,6 +1,8 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
 import service.*;
@@ -187,10 +189,12 @@ public class ChessClient {
                 ?  """
                     - redraw
                     - leave
-                    - move <space> <moveto>
+                    - move <from> <to>
                     - resign
-                    - highlight <space>
+                    - highlight <from>
                     - help
+                    
+                    *coords format is a letter followed by a number, ex. c2
                     """
                 : ((isLoggedIn)
                     ?  """
@@ -211,10 +215,12 @@ public class ChessClient {
     }
 
     public String printGame() {
-        return game.getBoard().toString((teamColor.equalsIgnoreCase("white"))
+        return game.getBoard().toString(stringToColor(teamColor));
+    }
+    private ChessGame.TeamColor stringToColor(String tc) {
+        return (tc.equalsIgnoreCase("white"))
                 ? ChessGame.TeamColor.WHITE
-                : ChessGame.TeamColor.BLACK
-        );
+                : ChessGame.TeamColor.BLACK;
     }
     public String redraw() {
         try {
@@ -260,12 +266,32 @@ public class ChessClient {
 //                var name = params[0];
 //                var response = server.createGame(new CreateGameRequest(authToken, name));
 //                return String.format("Successfully created game %s", name);
-                return "TODO highlight";
+                var coords = getCoords(params[0]); //col, row
+                var col = stringToColor(teamColor);
+                var moves = game.validMoves(new ChessPosition(coords[1], coords[0]));
+                return game.getBoard().toString(col, moves);
             } catch (Exception e) {
-                return "Highlight failed.";// + e.getMessage();
+                return "Highlight failed. Invalid parameters given.";// + e.getMessage();
             }
         }
         return "Highlight failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
+    }
+
+    private int[] splitCoords(String coords) {
+        return new int[]{(coords.charAt(0) - 'a') + 1, coords.charAt(1) - '0'};
+    }
+
+    /**
+     * parses a coord string and returns in the format of int[col, row]
+     * @param coords
+     * @return
+     */
+    private int[] getCoords(String coords) {
+        var ncoords = splitCoords(coords);
+        ncoords[0] = (stringToColor(teamColor) == ChessGame.TeamColor.WHITE)
+                ? ncoords[0]
+                : ChessBoard.BOARD_SIZE - ncoords[0] + 1;
+        return ncoords;
     }
 
     public boolean getInGameState() { return isInGame; }

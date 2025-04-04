@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -132,15 +134,19 @@ public class ChessBoard {
      * @return
      */
     public String toString(ChessGame.TeamColor team) {
+        return this.toString(team, new ArrayList<ChessMove>());
+    }
+    public String toString(ChessGame.TeamColor team, Collection<ChessMove> highlights) {
         StringBuilder boardString = new StringBuilder();
         boardString.append(printRowHeader(team));
         for(int row = 0; row < BOARD_SIZE; row++) {
             boardString.append(printRow(((team == ChessGame.TeamColor.WHITE)
-                    ? row : BOARD_SIZE - 1 - row), team));
+                    ? row : BOARD_SIZE - 1 - row), team, highlights));
         }
         boardString.append(printRowHeader(team));
         return boardString.toString();
     }
+
     private String printRowHeader(ChessGame.TeamColor team) {
         StringBuilder rowString = new StringBuilder();
         rowString.append(EscapeSequencesShared.SET_BG_COLOR_YELLOW);
@@ -159,11 +165,11 @@ public class ChessBoard {
         rowString.append("\n");
         return rowString.toString();
     }
-    private String printRow(int row, ChessGame.TeamColor team) {
+    private String printRow(int row, ChessGame.TeamColor team, Collection<ChessMove> highlights) {
         StringBuilder rowString = new StringBuilder();
         rowString.append(printRowCount(row));
         for(int col = 0; col < BOARD_SIZE; col++) {
-            rowString.append(setBgColor(team, row, col));
+            rowString.append(setBgColor(team, row, col, highlights));
             var pos = new ChessPosition(row, ((team == ChessGame.TeamColor.WHITE)
                 ? col : BOARD_SIZE - 1 - col), true);
             rowString.append(getPieceString(getPiece(pos)));
@@ -177,16 +183,25 @@ public class ChessBoard {
         return EscapeSequencesShared.SET_BG_COLOR_YELLOW
                 + " " + EscapeSequencesShared.SET_TEXT_COLOR_BLACK + (BOARD_SIZE - row) + " ";
     }
-    private String setBgColor(ChessGame.TeamColor team, int row, int col) {
-        return ((team == ChessGame.TeamColor.WHITE)
-                ? ((row % 2 == col % 2)
-                    ? EscapeSequencesShared.SET_BG_COLOR_RED
-                    : EscapeSequencesShared.SET_BG_COLOR_BLACK)
-                : ((row % 2 == col % 2)
-                    ? EscapeSequencesShared.SET_BG_COLOR_BLACK
-                    : EscapeSequencesShared.SET_BG_COLOR_RED)
+    private String setBgColor(ChessGame.TeamColor team, int row, int col, Collection<ChessMove> highlights) {
+        return ((shouldHighlightPosition(row, col, highlights))
+                ? EscapeSequencesShared.SET_BG_COLOR_GREEN
+                : ((team == ChessGame.TeamColor.WHITE)
+                    ? ((row % 2 == col % 2)
+                        ? EscapeSequencesShared.SET_BG_COLOR_RED
+                        : EscapeSequencesShared.SET_BG_COLOR_BLACK)
+                    : ((row % 2 == col % 2)
+                        ? EscapeSequencesShared.SET_BG_COLOR_BLACK
+                        : EscapeSequencesShared.SET_BG_COLOR_RED))
         );
     }
+    private boolean shouldHighlightPosition(int row, int col, Collection<ChessMove> highlights) {
+        return highlights.stream()
+                .map(ChessMove::getEndPosition)
+                .toList()
+                .contains(new ChessPosition(row, col, true));
+    }
+
     private String getPieceString(ChessPiece piece) {
         if (piece == null) { return "   "; }
         var type = piece.getPieceType();
