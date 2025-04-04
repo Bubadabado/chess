@@ -225,6 +225,8 @@ public class ChessClient {
     }
     public String leaveGame() {
         try {
+            isInGame = false;
+            //TODO: quit game
             return "todo leave game";
         } catch (Exception e) {
             return "leave failed.";// + e.getMessage();
@@ -266,5 +268,6 @@ public class ChessClient {
         return "Highlight failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
 
+    public boolean getInGameState() { return isInGame; }
     public boolean getLoginState() { return isLoggedIn; }
 }

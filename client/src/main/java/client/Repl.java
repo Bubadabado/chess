@@ -30,7 +30,11 @@ public class Repl {
 
     private void printInputPrompt() {
         System.out.print("\n" + EscapeSequences.SET_TEXT_COLOR_RED
-                + ((client.getLoginState()) ? "[Logged in] " : "[Logged out]")
+                + ((client.getInGameState())
+                    ? "[In game]"
+                    : ((client.getLoginState())
+                        ? "[Logged in] "
+                        : "[Logged out]"))
                 + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 }
