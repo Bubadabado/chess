@@ -169,10 +169,10 @@ public class ChessBoard {
         StringBuilder rowString = new StringBuilder();
         rowString.append(printRowCount(row));
         for(int col = 0; col < BOARD_SIZE; col++) {
-            rowString.append(setBgColor(team, row, ((team == ChessGame.TeamColor.WHITE)
-                    ? col : BOARD_SIZE - 1 - col), highlights));
-            var pos = new ChessPosition(row, ((team == ChessGame.TeamColor.WHITE)
-                ? col : BOARD_SIZE - 1 - col), true);
+            var newCol = ((team == ChessGame.TeamColor.WHITE)
+                    ? col : BOARD_SIZE - 1 - col);
+            rowString.append(setBgColor(row, newCol, highlights));
+            var pos = new ChessPosition(row, newCol, true);
             rowString.append(getPieceString(getPiece(pos)));
         }
         rowString.append(printRowCount(row));
@@ -184,7 +184,7 @@ public class ChessBoard {
         return EscapeSequencesShared.SET_BG_COLOR_YELLOW
                 + " " + EscapeSequencesShared.SET_TEXT_COLOR_BLACK + (BOARD_SIZE - row) + " ";
     }
-    private String setBgColor(ChessGame.TeamColor team, int row, int col, Collection<ChessMove> highlights) {
+    private String setBgColor(int row, int col, Collection<ChessMove> highlights) {
         return ((shouldHighlightPosition(row, col, highlights))
                 ? ((row % 2 == col % 2)
                     ? EscapeSequencesShared.SET_BG_COLOR_GREEN
