@@ -2,6 +2,7 @@ package client;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
@@ -245,9 +246,16 @@ public class ChessClient {
 //                var name = params[0];
 //                var response = server.createGame(new CreateGameRequest(authToken, name));
 //                return String.format("Successfully created game %s", name);
-                return "TODO make move";
+                //TODO web socket stuff, print turn, check
+                var startCoords = splitCoords(params[0]); //col, row
+                var endCoords = splitCoords(params[1]); //col, row
+                var move = new ChessMove(
+                        new ChessPosition(startCoords[1], startCoords[0]),
+                        new ChessPosition(endCoords[1], endCoords[0]));
+                game.makeMove(move);
+                return printGame();
             } catch (Exception e) {
-                return "Make move failed.";// + e.getMessage();
+                return "Invalid move.";// + e.getMessage();
             }
         }
         return "Make move failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
@@ -263,22 +271,14 @@ public class ChessClient {
         int numParams = 1;
         if(params.length == numParams) {
             try {
-//                var name = params[0];
-//                var response = server.createGame(new CreateGameRequest(authToken, name));
-//                return String.format("Successfully created game %s", name);
-                var coords = getCoords(params[0]); //col, row
-                var col = stringToColor(teamColor);
+                var coords = splitCoords(params[0]); //col, row
                 var moves = game.validMoves(new ChessPosition(coords[1], coords[0]));
-                return game.getBoard().toString(col, moves);
+                return game.getBoard().toString(stringToColor(teamColor), moves);
             } catch (Exception e) {
                 return "Highlight failed. Invalid parameters given.";// + e.getMessage();
             }
         }
         return "Highlight failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
-    }
-
-    private int[] splitCoords(String coords) {
-        return new int[]{(coords.charAt(0) - 'a') + 1, coords.charAt(1) - '0'};
     }
 
     /**
@@ -292,6 +292,9 @@ public class ChessClient {
                 ? ncoords[0]
                 : ChessBoard.BOARD_SIZE - ncoords[0] + 1;
         return ncoords;
+    }
+    private int[] splitCoords(String coords) {
+        return new int[]{(coords.charAt(0) - 'a') + 1, coords.charAt(1) - '0'};
     }
 
     public boolean getInGameState() { return isInGame; }

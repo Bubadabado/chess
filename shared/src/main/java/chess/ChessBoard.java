@@ -169,7 +169,8 @@ public class ChessBoard {
         StringBuilder rowString = new StringBuilder();
         rowString.append(printRowCount(row));
         for(int col = 0; col < BOARD_SIZE; col++) {
-            rowString.append(setBgColor(team, row, col, highlights));
+            rowString.append(setBgColor(team, row, ((team == ChessGame.TeamColor.WHITE)
+                    ? col : BOARD_SIZE - 1 - col), highlights));
             var pos = new ChessPosition(row, ((team == ChessGame.TeamColor.WHITE)
                 ? col : BOARD_SIZE - 1 - col), true);
             rowString.append(getPieceString(getPiece(pos)));
@@ -185,14 +186,12 @@ public class ChessBoard {
     }
     private String setBgColor(ChessGame.TeamColor team, int row, int col, Collection<ChessMove> highlights) {
         return ((shouldHighlightPosition(row, col, highlights))
-                ? EscapeSequencesShared.SET_BG_COLOR_GREEN
-                : ((team == ChessGame.TeamColor.WHITE)
-                    ? ((row % 2 == col % 2)
-                        ? EscapeSequencesShared.SET_BG_COLOR_RED
-                        : EscapeSequencesShared.SET_BG_COLOR_BLACK)
-                    : ((row % 2 == col % 2)
-                        ? EscapeSequencesShared.SET_BG_COLOR_BLACK
-                        : EscapeSequencesShared.SET_BG_COLOR_RED))
+                ? ((row % 2 == col % 2)
+                    ? EscapeSequencesShared.SET_BG_COLOR_GREEN
+                    : EscapeSequencesShared.SET_BG_COLOR_DARK_GREEN)
+                : ((row % 2 == col % 2)
+                    ? EscapeSequencesShared.SET_BG_COLOR_RED
+                    : EscapeSequencesShared.SET_BG_COLOR_BLACK)
         );
     }
     private boolean shouldHighlightPosition(int row, int col, Collection<ChessMove> highlights) {
