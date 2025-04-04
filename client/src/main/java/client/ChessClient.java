@@ -234,7 +234,7 @@ public class ChessClient {
         try {
             isInGame = false;
             //TODO: quit game
-            return "todo leave game";
+            return "You left the game.";
         } catch (Exception e) {
             return "leave failed.";// + e.getMessage();
         }
@@ -262,7 +262,9 @@ public class ChessClient {
     }
     public String resign() {
         try {
-            return "todo resign";
+            isInGame = false;
+            //TODO resign
+            return "You resigned the game.";
         } catch (Exception e) {
             return "Resign failed.";// + e.getMessage();
         }
