@@ -20,7 +20,7 @@ public class WebSocketHandler {
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getAuthToken(), session);
             case MAKE_MOVE -> makeMove();
-            case LEAVE -> leave();
+            case LEAVE -> leave(command.getAuthToken(), session);
             case RESIGN -> resign();
         }
     }
