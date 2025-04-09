@@ -6,12 +6,14 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
+import server.WebSocketFacade;
 import service.*;
 
 import java.util.Arrays;
 
 public class ChessClient {
     private final ServerFacade server;
+    private WebSocketFacade ws;
     private final String serverUrl;
     private boolean isLoggedIn;
     private String user;
@@ -19,12 +21,14 @@ public class ChessClient {
     private ChessGame game;
     private String teamColor;
     private boolean isInGame;
+    NotificationHandler messenger;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl, NotificationHandler messenger) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         isLoggedIn = false;
         isInGame = false;
+        this.messenger = messenger;
     }
 
     public String handleInput(String input) {
@@ -159,6 +163,8 @@ public class ChessClient {
                 game = targetGame.game();
                 teamColor = color;
                 isInGame = true;
+                ws = new WebSocketFacade(serverUrl, messenger); //TODO
+                ws.joinGame(authToken, id);
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
@@ -177,6 +183,7 @@ public class ChessClient {
                         new JoinGameRequest(authToken, null, Integer.parseInt(params[0])));
                 game = targetGame.game();
                 teamColor = "white";
+                ws = new WebSocketFacade(serverUrl, messenger); //TODO
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
                 return "Failed to observe game. Invalid id. ";// + e.getMessage();
@@ -234,6 +241,7 @@ public class ChessClient {
         try {
             isInGame = false;
             //TODO: quit game
+            ws = null;
             return "You left the game.";
         } catch (Exception e) {
             return "leave failed.";// + e.getMessage();
@@ -247,8 +255,8 @@ public class ChessClient {
 //                var response = server.createGame(new CreateGameRequest(authToken, name));
 //                return String.format("Successfully created game %s", name);
                 //TODO web socket stuff, print turn, check
-                var startCoords = splitCoords(params[0]); //col, row
-                var endCoords = splitCoords(params[1]); //col, row
+                var startCoords = splitCoords(params[0]);
+                var endCoords = splitCoords(params[1]);
                 var move = new ChessMove(
                         new ChessPosition(startCoords[1], startCoords[0]),
                         new ChessPosition(endCoords[1], endCoords[0]));
@@ -264,6 +272,7 @@ public class ChessClient {
         try {
             isInGame = false;
             //TODO resign
+            ws = null;
             return "You resigned the game.";
         } catch (Exception e) {
             return "Resign failed.";// + e.getMessage();
@@ -288,13 +297,6 @@ public class ChessClient {
      * @param coords
      * @return
      */
-    private int[] getCoords(String coords) {
-        var ncoords = splitCoords(coords);
-        ncoords[0] = (stringToColor(teamColor) == ChessGame.TeamColor.WHITE)
-                ? ncoords[0]
-                : ChessBoard.BOARD_SIZE - ncoords[0] + 1;
-        return ncoords;
-    }
     private int[] splitCoords(String coords) {
         return new int[]{(coords.charAt(0) - 'a') + 1, coords.charAt(1) - '0'};
     }
