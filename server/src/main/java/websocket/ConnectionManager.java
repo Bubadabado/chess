@@ -20,6 +20,10 @@ public class ConnectionManager {
         connections.remove(visitorName);
     }
 
+    public void removeAll() {
+        connections.clear();
+    }
+
     public void broadcast(String excludeAuth, Notification notification) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {

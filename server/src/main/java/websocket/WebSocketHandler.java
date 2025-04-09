@@ -40,7 +40,10 @@ public class WebSocketHandler {
         var notification = new Notification(message);
         connections.broadcast(auth, notification);
     }
-    private void resign() throws IOException {
-        System.out.println("TODO resign");
+    private void resign(String auth, Session session) throws IOException {
+        var message = String.format("%s resigned the game.", "TODO username");
+        var notification = new Notification(message);
+        connections.broadcast(auth, notification);
+        connections.removeAll();
     }
 }
