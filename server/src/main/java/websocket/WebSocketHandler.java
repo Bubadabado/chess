@@ -34,8 +34,11 @@ public class WebSocketHandler {
     private void makeMove() throws IOException {
         System.out.println("TODO makeMove");
     }
-    private void leave() throws IOException {
-        System.out.println("TODO leave");
+    private void leave(String auth, Session session) throws IOException {
+        connections.remove(auth);
+        var message = String.format("%s left the game.", "TODO username");
+        var notification = new Notification(message);
+        connections.broadcast(auth, notification);
     }
     private void resign() throws IOException {
         System.out.println("TODO resign");
