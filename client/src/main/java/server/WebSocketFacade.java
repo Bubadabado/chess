@@ -29,7 +29,6 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("test " + message);
                     Notification notification = new Gson().fromJson(message, Notification.class);
                     messenger.notify(notification);
                 }
@@ -48,6 +47,30 @@ public class WebSocketFacade extends Endpoint {
     public void joinGame(String auth, int id) throws Exception {
         try {
             var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, id);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public void makeMove(String auth, int id) throws Exception {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, auth, id);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public void leave(String auth, int id) throws Exception {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, id);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public void resign(String auth, int id) throws Exception {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
