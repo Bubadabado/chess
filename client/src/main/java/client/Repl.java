@@ -31,8 +31,8 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    public void notify(Notification n) {
-        System.out.println(n.message());
+    public void notify(String n) {
+        System.out.println(n);
         printInputPrompt();
     }
     public void reload(ChessGame g) {

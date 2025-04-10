@@ -37,8 +37,6 @@ public class WebSocketHandler {
                     command.getColor(), command.getCm(), command.getMove());
             case LEAVE -> leave(command.getAuthToken(), session, command.getGameID());
             case RESIGN -> resign(command.getAuthToken(), session, command.getGameID());
-//            case OBSERVE -> observe(command.getAuthToken(), session,
-//                    command.getUser(), command.getGameID());
         }
     }
 
@@ -48,7 +46,7 @@ public class WebSocketHandler {
         try {
             connections.add(auth, session, id);
             String color = userColorInGame(auth, id, user);
-            var message = String.format("%s joined the game as %s.", user, color);
+            var message = String.format("%s joined the game as %s.", user, (color.isEmpty()) ? "an observer" : color);
             var game = getGame(auth, id);
             System.out.println(game);
             var n = new LoadGameMessage(game);
@@ -136,13 +134,6 @@ public class WebSocketHandler {
             return "";
         }
     }
-
-//    private void observe(String auth, Session session, String user, int id) throws IOException {
-//        connections.add(auth, session, id);
-//        var message = String.format("%s joined the game as an observer.", user);
-//        var notification = new ServerMessage(new Notification(message));
-//        connections.broadcast(auth, notification, id);
-//    }
     private void makeMove(String auth, Session session, int id,
                           String color, String move, ChessMove cm) throws IOException {
         var user = getUser(auth);
@@ -153,20 +144,22 @@ public class WebSocketHandler {
                 return;
             }
             var game = getGame(auth, id);
+            if(game.isGameOver()) {
+                var n = new ErrorMessage("Error: The game is over.");
+                connections.broadcastOne(auth, n);
+                return;
+            }
+            if(userColorInGame(auth, id, user).isEmpty()) {
+                var n = new ErrorMessage("Error: Observers cannot make moves.");
+                connections.broadcastOne(auth, n);
+                return;
+            }
             if(!userColorInGame(auth, id, user).equals((game.getTeamTurn() == ChessGame.TeamColor.WHITE)
                     ? "white" : "black")) {
                 var n = new ErrorMessage("Error: Out of turn.");
                 connections.broadcastOne(auth, n);
                 return;
             }
-
-            if(game.isGameOver()) {
-                var n = new ErrorMessage("Error: The game is over.");
-                connections.broadcastOne(auth, n);
-                return;
-            }
-            //TODO validate user as non observer
-            //TODO validate user not acting for opponent
             game.makeMove(cm);
             GameService.updateGame(new UpdateGameRequest(auth, id, game));
             var n = new LoadGameMessage(game);

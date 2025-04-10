@@ -172,7 +172,7 @@ public class ChessClient {
                 listid = Integer.parseInt(params[0]);
                 ws = new WebSocketFacade(serverUrl, messenger);
                 ws.joinGame(user, color, authToken, id, game);
-                return "Successfully joined game \n" + printGame();
+                return "";//"Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
             }
@@ -180,8 +180,10 @@ public class ChessClient {
         return "Join failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public void reloadGame(ChessGame g) {
-        game = g;
-        messenger.notify(new Notification("\n" + printGame()));
+        try {
+            game = g;
+            messenger.notify("\n" + printGame());
+        } catch (Exception e) {}
     }
     public String observe(String... params) {
         int numParams = 1;
@@ -268,7 +270,7 @@ public class ChessClient {
         }
     }
     public String makeMove(String... params) {
-        if(isObserving) { return "Observers cannot make moves."; }
+//        if(isObserving) { return "Observers cannot make moves."; }
         int numParams = 2;
         if(params.length == numParams) {
             try {
@@ -277,8 +279,9 @@ public class ChessClient {
                 var move = new ChessMove(
                         new ChessPosition(startCoords[1], startCoords[0]),
                         new ChessPosition(endCoords[1], endCoords[0]));
-                game.makeMove(move);
-                ws.makeMove(user, teamColor, game, params[0] + " to " + params[1], authToken, gameid);
+//                game.makeMove(move);
+                //params[0] + " to " + params[1]
+                ws.makeMove(user, teamColor, game, move,params[0] + " to " + params[1], authToken, gameid);
                 return "";
             } catch (Exception e) {
                 return "Invalid move.";// + e.getMessage();

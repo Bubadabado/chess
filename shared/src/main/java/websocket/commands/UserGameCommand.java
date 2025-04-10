@@ -25,7 +25,7 @@ public class UserGameCommand {
 
 //    private final ChessGame game;
 
-    private final String cm;
+    private String cm;
 
     private final ChessMove move;
 
@@ -127,6 +127,7 @@ public class UserGameCommand {
     public ChessMove getMove() { return move; }
 
     public String getCm() { return cm; }
+    public void setCm(String cm) { this.cm = cm; }
 
     @Override
     public boolean equals(Object o) {
