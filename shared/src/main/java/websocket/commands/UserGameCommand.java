@@ -103,7 +103,7 @@ public class UserGameCommand {
         MAKE_MOVE,
         LEAVE,
         RESIGN,
-        OBSERVE
+//        OBSERVE
     }
 
     public CommandType getCommandType() {

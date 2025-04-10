@@ -60,7 +60,7 @@ public class GameService {
         }
     }
 
-    public static void leaveGame(String auth, int id, String user, String col) {
+    public static void leaveGame(String auth, int id, String user, String col) throws DataAccessException {
         var games = new SQLGameDAO();
         try {
             if(auth != null && checkAuth(auth)) {
@@ -69,7 +69,7 @@ public class GameService {
                 throw new DataAccessException("Error: unauthorized");
             }
         } catch (DataAccessException e) {
-//            throw e;
+            throw e;
         }
     }
 

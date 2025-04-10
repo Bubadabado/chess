@@ -32,23 +32,22 @@ public class WebSocketHandler {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         System.out.println(command.getCommandType());
         switch (command.getCommandType()) {
-            case CONNECT -> connect(command.getAuthToken(), session,
-                    command.getColor(), command.getGameID());
+            case CONNECT -> connect(command.getAuthToken(), session, command.getGameID());
             case MAKE_MOVE -> makeMove(command.getAuthToken(), session, command.getGameID(),
                     command.getColor(), command.getCm(), command.getMove());
-//            case LEAVE -> leave(command.getAuthToken(), session,
-//                    command.getUser(), command.getGameID(), command.getColor());
+            case LEAVE -> leave(command.getAuthToken(), session, command.getGameID());
             case RESIGN -> resign(command.getAuthToken(), session, command.getGameID());
 //            case OBSERVE -> observe(command.getAuthToken(), session,
 //                    command.getUser(), command.getGameID());
         }
     }
 
-    private void connect(String auth, Session session, String color, int id) throws IOException {
+    private void connect(String auth, Session session, int id) throws IOException {
         System.out.println("connecting");
         var user = getUser(auth);
         try {
             connections.add(auth, session, id);
+            String color = userColorInGame(auth, id, user);
             var message = String.format("%s joined the game as %s.", user, color);
             var game = getGame(auth, id);
             System.out.println(game);
@@ -90,6 +89,26 @@ public class WebSocketHandler {
             connections.broadcastOne(auth, n);
         }
     }
+    private void leave(String auth, Session session, int id) throws IOException {
+        var user = getUser(auth);
+        try {
+            System.out.println(user + " leaving");
+            connections.remove(auth);
+            String col = userColorInGame(auth, id, user);
+            if(!col.isEmpty()) {
+                GameService.leaveGame(auth, id, user, col);
+            }
+            var notification = new NotificationMessage(String.format("%s left the game.", user));
+            connections.broadcast(auth, notification, id);
+        } catch (IOException | DataAccessException e) {
+            var n = new ErrorMessage("Error: Unauthorized.");
+            connections.broadcastSession(session, n);
+        } catch (NoSuchElementException e) {
+            var n = new ErrorMessage("Error: Game does not exist.");
+            connections.broadcastOne(auth, n);
+        }
+    }
+
     private String getUser(String auth) {
         try {
             return UserService.getUser(auth);
@@ -107,9 +126,9 @@ public class WebSocketHandler {
             var game = GameService.listGames(new ListGameRequest(auth)).games().stream().filter((g) -> {
                 return g.gameID() == id;
             }).toList().getFirst();
-            return (game.whiteUsername().equals(user))
+            return ((game.whiteUsername() != null) && game.whiteUsername().equals(user))
                     ? "white"
-                    : ((game.blackUsername().equals(user))
+                    : ((game.blackUsername() != null) && (game.blackUsername().equals(user))
                         ? "black"
                         : ""
             );
@@ -117,6 +136,7 @@ public class WebSocketHandler {
             return "";
         }
     }
+
 //    private void observe(String auth, Session session, String user, int id) throws IOException {
 //        connections.add(auth, session, id);
 //        var message = String.format("%s joined the game as an observer.", user);
@@ -218,12 +238,6 @@ public class WebSocketHandler {
 //                    new Notification(msg.toString())), id);
 //        }
 //    }
-//    private void leave(String auth, Session session, String user, int id, String col) throws IOException {
-//        connections.remove(auth);
-//        GameService.leaveGame(auth, id, user, col);
-//        var message = String.format("%s left the game.", user);
-//        var notification = new ServerMessage(new Notification(message));
-//        connections.broadcast(auth, notification, id);
-//    }
+
 
 }
