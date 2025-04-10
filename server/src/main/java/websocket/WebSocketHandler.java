@@ -38,8 +38,7 @@ public class WebSocketHandler {
                     command.getColor(), command.getCm(), command.getMove());
 //            case LEAVE -> leave(command.getAuthToken(), session,
 //                    command.getUser(), command.getGameID(), command.getColor());
-//            case RESIGN -> resign(command.getAuthToken(), session,
-//                    command.getUser(), command.getGameID(), command.getGame());
+            case RESIGN -> resign(command.getAuthToken(), session, command.getGameID());
 //            case OBSERVE -> observe(command.getAuthToken(), session,
 //                    command.getUser(), command.getGameID());
         }
@@ -57,6 +56,32 @@ public class WebSocketHandler {
             connections.broadcastOne(auth, n);
             var notification = new NotificationMessage(message);//new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(auth, notification, id);
+        } catch (IOException | DataAccessException e) {
+            var n = new ErrorMessage("Error: Unauthorized.");
+            connections.broadcastSession(session, n);
+        } catch (NoSuchElementException e) {
+            var n = new ErrorMessage("Error: Game does not exist.");
+            connections.broadcastOne(auth, n);
+        }
+    }
+    private void resign(String auth, Session session, int id) throws IOException {
+        var user = getUser(auth);
+        try {
+            if(userColorInGame(auth, id, user).isEmpty()) {
+                var n = new ErrorMessage("Error: Observers cannot resign.");
+                connections.broadcastOne(auth, n);
+                return;
+            }
+            var game = getGame(auth, id);
+            if(game.isGameOver()) {
+                var n = new ErrorMessage("Error: The game is over.");
+                connections.broadcastOne(auth, n);
+                return;
+            }
+            game.setGameOver(true);
+            GameService.updateGame(new UpdateGameRequest(auth, id, game));
+            var notification = new NotificationMessage(String.format("%s resigned the game.", user));
+            connections.broadcast("", notification, id);
         } catch (IOException | DataAccessException e) {
             var n = new ErrorMessage("Error: Unauthorized.");
             connections.broadcastSession(session, n);
@@ -200,12 +225,5 @@ public class WebSocketHandler {
 //        var notification = new ServerMessage(new Notification(message));
 //        connections.broadcast(auth, notification, id);
 //    }
-//    private void resign(String auth, Session session, String user, int id, ChessGame game) throws IOException {
-//        var message = String.format("%s resigned the game.", user);
-//        game.setGameOver(true);
-//        GameService.updateGame(new UpdateGameRequest(auth, id, game));
-//        var notification = new ServerMessage(new Notification(message));
-//        connections.broadcast(auth, notification, id);
-//        connections.removeAll();
-//    }
+
 }
