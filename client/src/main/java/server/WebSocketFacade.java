@@ -32,7 +32,10 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage smsg = new Gson().fromJson(message, ServerMessage.class);
-                    if(smsg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+//                    System.out.println(smsg.getServerMessageType());
+//                    System.out.println(smsg.getNotification().message());
+                    if(smsg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME
+                            && smsg.getGame() != null) {
                         messenger.reload(smsg.getGame());
                     }
                     Notification notification = smsg.getNotification();//new Gson().fromJson(smsg.getNotification().toString(), Notification.class);
@@ -50,9 +53,9 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
-    public void joinGame(String user, String color, String auth, int id) throws Exception {
+    public void joinGame(String user, String color, String auth, int id, ChessGame game) throws Exception {
         try {
-            var command = new UserGameCommand(user, color, auth, id);
+            var command = new UserGameCommand(user, color, auth, id, game);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());

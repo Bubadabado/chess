@@ -171,7 +171,7 @@ public class ChessClient {
                 gameid = id;
                 listid = Integer.parseInt(params[0]);
                 ws = new WebSocketFacade(serverUrl, messenger);
-                ws.joinGame(user, color, authToken, id);
+                ws.joinGame(user, color, authToken, id, game);
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";

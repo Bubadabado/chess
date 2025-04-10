@@ -12,8 +12,8 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
-    private ChessGame game;
-    private Notification notification;
+//    private ChessGame game;
+    private String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -24,24 +24,29 @@ public class ServerMessage {
     public ServerMessage(ServerMessageType type) {
         this.serverMessageType = type;
     }
+//    public ServerMessage(ServerMessageType type, ChessGame g) {
+//        this.serverMessageType = type;
+//        this.game = g;
+//    }
 
-    public ServerMessage(ChessGame game, Notification notification) {
-        this.serverMessageType = ServerMessageType.LOAD_GAME;
-        this.game = game;
-        this.notification = notification;
-    }
-    public ServerMessage(ServerMessageType type, Notification notification) {
+//    public ServerMessage(ChessGame game, Notification notification) {
+//        this.serverMessageType = ServerMessageType.LOAD_GAME;
+////        this.game = game;
+//        this.notification = notification;
+//    }
+    public ServerMessage(ServerMessageType type, String message) {
         this.serverMessageType = type;
-        this.notification = notification;
+        this.message = message;
+//        this.game = null;
     }
-
-    public ServerMessage(Notification notification) {
+//
+    public ServerMessage(String message) {
         this.serverMessageType = ServerMessageType.NOTIFICATION;
-        this.notification = notification;
+        this.message = message;
+//        this.game = null;
     }
 
-    public ChessGame getGame() { return this.game; }
-    public Notification getNotification() { return this.notification; }
+//    public Notification getNotification() { return this.notification; }
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;

@@ -37,13 +37,13 @@ public class UserGameCommand {
         this.move = "";
     }
     //connect
-    public UserGameCommand(String userName, String color, String authToken, Integer gameID) {
+    public UserGameCommand(String userName, String color, String authToken, Integer gameID, ChessGame game) {
         this.commandType = CommandType.CONNECT;
         this.authToken = authToken;
         this.gameID = gameID;
         this.color = color;
         this.userName = userName;
-        this.game = new ChessGame();
+        this.game = game;
         this.move = "";
     }
     //make move

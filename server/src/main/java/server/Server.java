@@ -9,11 +9,11 @@ import spark.*;
 import websocket.WebSocketHandler;
 
 public class Server {
-    private static final WebSocketHandler webSocketHandler = new WebSocketHandler();
+    private final WebSocketHandler webSocketHandler;
 
-//    public Server() {
-//        webSocketHandler = new WebSocketHandler();
-//    }
+    public Server() {
+        webSocketHandler = new WebSocketHandler();
+    }
 
     public int run(int desiredPort) {
         try {
@@ -29,7 +29,7 @@ public class Server {
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
-        createRoutes();
+        this.createRoutes();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -40,7 +40,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private static void createRoutes() {
+    private void createRoutes() {
         Spark.webSocket("/ws", webSocketHandler);
         Spark.delete("/db", AdminHandler::clear);
         Spark.post("/user", UserHandler::handleRegister);

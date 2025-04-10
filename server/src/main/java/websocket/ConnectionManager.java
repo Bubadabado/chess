@@ -30,6 +30,7 @@ public class ConnectionManager {
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.auth.equals(excludeAuth) && (c.gameid == id)) {
+                    System.out.println(new Gson().toJson(notification));
                     c.send(new Gson().toJson(notification));
                 }
             } else {
@@ -45,6 +46,7 @@ public class ConnectionManager {
     public void broadcastOne(String auth, ServerMessage notification) throws IOException {
         var c = connections.get(auth);
         if(c.session.isOpen()) {
+//            System.out.println(new Gson().toJson(notification));
             c.send(new Gson().toJson(notification));
         } else {
             connections.remove(c.auth);
