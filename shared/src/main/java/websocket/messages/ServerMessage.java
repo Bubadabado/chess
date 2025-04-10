@@ -30,6 +30,11 @@ public class ServerMessage {
         this.game = game;
         this.notification = notification;
     }
+    public ServerMessage(ServerMessageType type, Notification notification) {
+        this.serverMessageType = type;
+        this.notification = notification;
+    }
+
     public ServerMessage(Notification notification) {
         this.serverMessageType = ServerMessageType.NOTIFICATION;
         this.notification = notification;

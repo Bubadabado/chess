@@ -2,6 +2,9 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import service.LoginRequest;
+import service.LogoutRequest;
+import service.RegisterRequest;
 import service.*;
 import spark.Request;
 import spark.Response;

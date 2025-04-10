@@ -1,6 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import service.CreateGameRequest;
 import server.Server;
 import server.ServerFacade;
 import service.*;
@@ -76,13 +77,13 @@ public class ServerFacadeTests {
     public void testCreateSuccess() throws Exception {
         var res = facade.register(new RegisterRequest("un", "pw", "em"));
         assertDoesNotThrow(() -> {
-            facade.createGame(new CreateGameRequest(res.authToken(), "game1"));
+            facade.createGame(new service.CreateGameRequest(res.authToken(), "game1"));
         });
     }
     @Test
     public void testCreateFailure() throws Exception {
         assertThrows(Exception.class, () -> {
-            var res = facade.createGame(new CreateGameRequest("no auth", "game1"));
+            var res = facade.createGame(new service.CreateGameRequest("no auth", "game1"));
         });
     }
 
@@ -104,7 +105,7 @@ public class ServerFacadeTests {
     public void testJoinSuccess() throws Exception {
         var res = facade.register(new RegisterRequest("un", "pw", "em"));
         assertDoesNotThrow(() -> {
-            var game = facade.createGame(new CreateGameRequest(res.authToken(), "game1"));
+            var game = facade.createGame(new service.CreateGameRequest(res.authToken(), "game1"));
             facade.joinGame(new JoinGameRequest(res.authToken(), "BLACK", game.gameID()));
         });
     }

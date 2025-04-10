@@ -1,13 +1,13 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import model.GameData;
+import service.*;
 import server.ServerFacade;
 import server.WebSocketFacade;
-import service.*;
+import websocket.messages.Notification;
 
 import java.util.Arrays;
 
@@ -19,6 +19,7 @@ public class ChessClient {
     private String user;
     private String authToken;
     private ChessGame game;
+    private int listid;
     private int gameid;
     private boolean isObserving;
     private String teamColor;
@@ -38,9 +39,10 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            cmd = cmd.toLowerCase();
             if(isInGame) {
                 return switch (cmd) {
-                    case "redraw" -> printGame();
+                    case "redraw" -> redraw();
                     case "leave" -> leaveGame();
                     case "move" -> makeMove(params);
                     case "resign" -> resign();
@@ -109,7 +111,6 @@ public class ChessClient {
         try {
             var response = server.logout(new LogoutRequest(authToken));
             isLoggedIn = false;
-            //TODO: leave game
             isInGame = false;
             return "Goodbye. \n" + help();
         } catch (Exception e) {
@@ -138,14 +139,16 @@ public class ChessClient {
             StringBuilder result = new StringBuilder();
             int i = 0;
             for(GameData game : response.games()) {
-                result.append(i);
-                result.append(": ");
-                result.append(game.gameName());
-                result.append(" - White: ");
-                result.append((game.whiteUsername() == null) ? "(empty)" : game.whiteUsername());
-                result.append(", Black: ");
-                result.append((game.blackUsername() == null) ? "(empty)" : game.blackUsername());
-                result.append("\n");
+                if(!game.game().isGameOver()) {
+                    result.append(i);
+                    result.append(": ");
+                    result.append(game.gameName());
+                    result.append(" - White: ");
+                    result.append((game.whiteUsername() == null) ? "(empty)" : game.whiteUsername());
+                    result.append(", Black: ");
+                    result.append((game.blackUsername() == null) ? "(empty)" : game.blackUsername());
+                    result.append("\n");
+                }
                 i++;
             }
             return result.toString();
@@ -166,7 +169,8 @@ public class ChessClient {
                 teamColor = color;
                 isInGame = true;
                 gameid = id;
-                ws = new WebSocketFacade(serverUrl, messenger); //TODO
+                listid = Integer.parseInt(params[0]);
+                ws = new WebSocketFacade(serverUrl, messenger);
                 ws.joinGame(user, color, authToken, id);
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
@@ -174,6 +178,10 @@ public class ChessClient {
             }
         }
         return "Join failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
+    }
+    public void reloadGame(ChessGame g) {
+        game = g;
+        messenger.notify(new Notification("\n" + printGame()));
     }
     public String observe(String... params) {
         int numParams = 1;
@@ -187,9 +195,10 @@ public class ChessClient {
                 game = targetGame.game();
                 teamColor = "white";
                 gameid = id;
+                listid = Integer.parseInt(params[0]);
                 isInGame = true;
                 isObserving = true;
-                ws = new WebSocketFacade(serverUrl, messenger); //TODO
+                ws = new WebSocketFacade(serverUrl, messenger);
                 ws.observeGame(user, authToken, id);
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
@@ -241,14 +250,16 @@ public class ChessClient {
         try {
             return printGame();
         } catch (Exception e) {
-            return "Redraw failed.";// + e.getMessage();
+            return "Redraw failed." + e.getMessage();
         }
     }
     public String leaveGame() {
         try {
+//            var response = server.leaveGame(new LeaveGameRequest(authToken, gameid));
             isInGame = false;
-            ws.leave(user, authToken, gameid);
+            ws.leave(user, authToken, gameid, teamColor);
             gameid = -1;
+            listid = -1;
             ws = null;
             isObserving = false;
             return "You left the game.";
@@ -261,17 +272,14 @@ public class ChessClient {
         int numParams = 2;
         if(params.length == numParams) {
             try {
-//                var name = params[0];
-//                var response = server.createGame(new CreateGameRequest(authToken, name));
-//                return String.format("Successfully created game %s", name);
-                //TODO web socket stuff, print turn, check
                 var startCoords = splitCoords(params[0]);
                 var endCoords = splitCoords(params[1]);
                 var move = new ChessMove(
                         new ChessPosition(startCoords[1], startCoords[0]),
                         new ChessPosition(endCoords[1], endCoords[0]));
                 game.makeMove(move);
-                return printGame();
+                ws.makeMove(user, teamColor, game, params[0] + " to " + params[1], authToken, gameid);
+                return "";
             } catch (Exception e) {
                 return "Invalid move.";// + e.getMessage();
             }
@@ -282,8 +290,9 @@ public class ChessClient {
         if(isObserving) { return "Observers cannot resign."; }
         try {
             isInGame = false;
-            ws.resign(user, authToken, gameid);
+            ws.resign(user, authToken, gameid, game);
             gameid = -1;
+            listid = -1;
             ws = null;
             return "You resigned the game.";
         } catch (Exception e) {
@@ -294,7 +303,7 @@ public class ChessClient {
         int numParams = 1;
         if(params.length == numParams) {
             try {
-                var coords = splitCoords(params[0]); //col, row
+                var coords = splitCoords(params[0].substring(0, 2)); //col, row
                 var moves = game.validMoves(new ChessPosition(coords[1], coords[0]));
                 return game.getBoard().toString(stringToColor(teamColor), moves);
             } catch (Exception e) {

@@ -1,9 +1,7 @@
 package service;
 
 import dataaccess.*;
-
-import java.util.ArrayList;
-import java.util.Objects;
+import records.*;
 
 public class GameService {
     public static ListGameResult listGames(ListGameRequest listGameRequest) throws DataAccessException {
@@ -46,6 +44,32 @@ public class GameService {
             }
         } catch (DataAccessException e) {
             throw e;
+        }
+    }
+
+    public static void updateGame(UpdateGameRequest updateGameRequest) {
+        var games = new SQLGameDAO();
+        try {
+            if(updateGameRequest.authToken() != null && checkAuth(updateGameRequest.authToken())) {
+                games.updateGame(updateGameRequest.gameID(), updateGameRequest.game());
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+//            throw e;
+        }
+    }
+
+    public static void leaveGame(String auth, int id, String user, String col) {
+        var games = new SQLGameDAO();
+        try {
+            if(auth != null && checkAuth(auth)) {
+                games.leaveGame(id, user, col);
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+//            throw e;
         }
     }
 

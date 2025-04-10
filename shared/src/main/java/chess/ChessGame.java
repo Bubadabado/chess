@@ -16,6 +16,7 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor currentTeamTurn;
+    private boolean gameOver;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -146,7 +147,7 @@ public class ChessGame {
                     .stream()
                     .map(board::getPiece)
                     .anyMatch(piece -> piece.getPieceType() != ChessPiece.PieceType.KING);
-        return isInCheck(teamColor) && !kingHasValidMoves(teamColor) && !pieceCanBlock;
+        return gameOver = (isInCheck(teamColor) && !kingHasValidMoves(teamColor) && !pieceCanBlock);
     }
 
     /**
@@ -242,6 +243,13 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+    public boolean isGameOver() {
+        return this.gameOver;
     }
 
     /**

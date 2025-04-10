@@ -1,6 +1,8 @@
 package client;
 
 import java.util.Scanner;
+
+import chess.ChessGame;
 import ui.EscapeSequences;
 import websocket.messages.Notification;
 
@@ -32,6 +34,9 @@ public class Repl implements NotificationHandler {
     public void notify(Notification n) {
         System.out.println(n.message());
         printInputPrompt();
+    }
+    public void reload(ChessGame g) {
+        client.reloadGame(g);
     }
 
 

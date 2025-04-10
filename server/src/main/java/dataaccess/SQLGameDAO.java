@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 
 public class SQLGameDAO implements GameDAO{
@@ -125,6 +126,42 @@ public class SQLGameDAO implements GameDAO{
 //            throw new RuntimeException(e);
         }
         return games;
+    }
+
+    public void updateGame(int id, ChessGame game) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var json = new Gson().toJson(game);
+            var query = "UPDATE games " +
+                    "SET game = ? " +
+                    "WHERE id = ? ";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setString(1, json);
+                preparedStatement.setInt(2, id);
+                var rs = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: failed to connect to DB on update");
+        }
+    }
+
+    public void leaveGame(int id, String user, String playerColor) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            if(!playerColor.equals("black") && !playerColor.equals("white")) {
+                throw new DataAccessException("invalid colors");
+            }
+            String col = playerColor + "_username";
+            var query = "UPDATE games " +
+                    "SET " + col + " = ? " +
+                    "WHERE id = ? ";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.setNull(1, Types.VARCHAR);
+                preparedStatement.setInt(2, id);
+                var rs = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("error: " + e.getMessage());
+            throw new DataAccessException("Error: failed to connect to DB on leave game");
+        }
     }
 
     @Override
