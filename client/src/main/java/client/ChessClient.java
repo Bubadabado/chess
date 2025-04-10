@@ -20,6 +20,7 @@ public class ChessClient {
     private String authToken;
     private ChessGame game;
     private int gameid;
+    private boolean isObserving;
     private String teamColor;
     private boolean isInGame;
     NotificationHandler messenger;
@@ -166,7 +167,7 @@ public class ChessClient {
                 isInGame = true;
                 gameid = id;
                 ws = new WebSocketFacade(serverUrl, messenger); //TODO
-                ws.joinGame(authToken, id);
+                ws.joinGame(user, color, authToken, id);
                 return "Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
@@ -187,7 +188,9 @@ public class ChessClient {
                 teamColor = "white";
                 gameid = id;
                 isInGame = true;
+                isObserving = true;
                 ws = new WebSocketFacade(serverUrl, messenger); //TODO
+                ws.observeGame(user, authToken, id);
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
                 return "Failed to observe game. Invalid id. ";// + e.getMessage();
@@ -244,15 +247,17 @@ public class ChessClient {
     public String leaveGame() {
         try {
             isInGame = false;
-            ws.leave(authToken, gameid);
+            ws.leave(user, authToken, gameid);
             gameid = -1;
             ws = null;
+            isObserving = false;
             return "You left the game.";
         } catch (Exception e) {
             return "leave failed.";// + e.getMessage();
         }
     }
     public String makeMove(String... params) {
+        if(isObserving) { return "Observers cannot make moves."; }
         int numParams = 2;
         if(params.length == numParams) {
             try {
@@ -274,9 +279,10 @@ public class ChessClient {
         return "Make move failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String resign() {
+        if(isObserving) { return "Observers cannot resign."; }
         try {
             isInGame = false;
-            ws.resign(authToken, gameid);
+            ws.resign(user, authToken, gameid);
             gameid = -1;
             ws = null;
             return "You resigned the game.";

@@ -16,17 +16,40 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
+    private final String color;
+
+    private final String userName;
+
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
+        this.color = "";
+        this.userName = "";
+    }
+
+    public UserGameCommand(String userName, String color, String authToken, Integer gameID) {
+        this.commandType = CommandType.CONNECT;
+        this.authToken = authToken;
+        this.gameID = gameID;
+        this.color = color;
+        this.userName = userName;
+    }
+
+    public UserGameCommand(String userName, CommandType commandType, String authToken, Integer gameID) {
+        this.commandType = commandType;
+        this.authToken = authToken;
+        this.gameID = gameID;
+        this.color = "";
+        this.userName = userName;
     }
 
     public enum CommandType {
         CONNECT,
         MAKE_MOVE,
         LEAVE,
-        RESIGN
+        RESIGN,
+        OBSERVE
     }
 
     public CommandType getCommandType() {
@@ -40,6 +63,10 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
+
+    public String getColor() { return color; }
+
+    public String getUser() { return userName; }
 
     @Override
     public boolean equals(Object o) {

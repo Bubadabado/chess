@@ -48,9 +48,17 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
-    public void joinGame(String auth, int id) throws Exception {
+    public void joinGame(String user, String color, String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, id);
+            var command = new UserGameCommand(user, color, auth, id);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public void observeGame(String user, String auth, int id) throws Exception {
+        try {
+            var command = new UserGameCommand(user, UserGameCommand.CommandType.OBSERVE, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
@@ -64,17 +72,17 @@ public class WebSocketFacade extends Endpoint {
             throw new Exception(e.getMessage());
         }
     }
-    public void leave(String auth, int id) throws Exception {
+    public void leave(String user, String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, id);
+            var command = new UserGameCommand(user, UserGameCommand.CommandType.LEAVE, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
         }
     }
-    public void resign(String auth, int id) throws Exception {
+    public void resign(String user, String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, id);
+            var command = new UserGameCommand(user, UserGameCommand.CommandType.RESIGN, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
