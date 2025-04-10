@@ -1,12 +1,13 @@
 package websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     public final HashMap<String, Connection> connections = new HashMap<>();
@@ -24,12 +25,14 @@ public class ConnectionManager {
         connections.clear();
     }
 
-    public void broadcast(String excludeAuth, Notification notification) throws IOException {
+    public void broadcast(String excludeAuth, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.auth.equals(excludeAuth)) {
-                    c.send(notification.toString());
+//                System.out.println("sending " + notification.toString()); //TODO remove
+                    c.send(new Gson().toJson(notification));
+//                System.out.println("Sending to session ID: " + c.session.toString());
                 }
             } else {
                 removeList.add(c);

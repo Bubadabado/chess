@@ -4,6 +4,7 @@ import websocket.messages.Notification;
 import client.NotificationHandler;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler messenger;
-
 
     public WebSocketFacade(String url, NotificationHandler messenger) throws Exception {
         try {
@@ -29,7 +29,11 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
+                    ServerMessage smsg = new Gson().fromJson(message, ServerMessage.class);
+                    if(smsg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        //TODO
+                    }
+                    Notification notification = smsg.getNotification();//new Gson().fromJson(smsg.getNotification().toString(), Notification.class);
                     messenger.notify(notification);
                 }
             });

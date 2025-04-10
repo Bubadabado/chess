@@ -19,6 +19,7 @@ public class ChessClient {
     private String user;
     private String authToken;
     private ChessGame game;
+    private int gameid;
     private String teamColor;
     private boolean isInGame;
     NotificationHandler messenger;
@@ -163,6 +164,7 @@ public class ChessClient {
                 game = targetGame.game();
                 teamColor = color;
                 isInGame = true;
+                gameid = id;
                 ws = new WebSocketFacade(serverUrl, messenger); //TODO
                 ws.joinGame(authToken, id);
                 return "Successfully joined game \n" + printGame();
@@ -183,6 +185,8 @@ public class ChessClient {
                         new JoinGameRequest(authToken, null, Integer.parseInt(params[0])));
                 game = targetGame.game();
                 teamColor = "white";
+                gameid = id;
+                isInGame = true;
                 ws = new WebSocketFacade(serverUrl, messenger); //TODO
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
@@ -240,7 +244,8 @@ public class ChessClient {
     public String leaveGame() {
         try {
             isInGame = false;
-            //TODO: quit game
+            ws.leave(authToken, gameid);
+            gameid = -1;
             ws = null;
             return "You left the game.";
         } catch (Exception e) {
@@ -271,7 +276,8 @@ public class ChessClient {
     public String resign() {
         try {
             isInGame = false;
-            //TODO resign
+            ws.resign(authToken, gameid);
+            gameid = -1;
             ws = null;
             return "You resigned the game.";
         } catch (Exception e) {
