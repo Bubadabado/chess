@@ -22,9 +22,6 @@ public class ConnectionManager {
         connections.remove(auth);
     }
 
-    public void removeAll() {
-        connections.clear();
-    }
     public boolean hasConnection(String auth) {
         System.out.println(auth);
         System.out.println(connections.get(auth).auth);

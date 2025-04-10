@@ -58,43 +58,34 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
-    public void joinGame(String user, String color, String auth, int id, ChessGame game) throws Exception {
+    public void joinGame(String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, id);//user, color, auth, id, game);
+            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
         }
     }
-    public void observeGame(String user, String auth, int id) throws Exception {
+    public void makeMove(ChessMove move, String cm, String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, id);//new UserGameCommand(user, UserGameCommand.CommandType.OBSERVE, auth, id);
-            this.session.getBasicRemote().sendText(new Gson().toJson(command));
-        } catch (IOException e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-    public void makeMove(String user, String color, ChessGame game
-            , ChessMove move, String cm, String auth, int id) throws Exception {
-        try {
-            var command = new UserGameCommand(auth, id, move);//new UserGameCommand(user, color, game, move, auth, id);
+            var command = new UserGameCommand(auth, id, move);
             command.setCm(cm);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
         }
     }
-    public void leave(String user, String auth, int id, String color) throws Exception {
+    public void leave(String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, id);//new UserGameCommand(user, UserGameCommand.CommandType.LEAVE, auth, id, color);
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());
         }
     }
-    public void resign(String user, String auth, int id, ChessGame game) throws Exception {
+    public void resign(String auth, int id) throws Exception {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, id);//new UserGameCommand(user, game, UserGameCommand.CommandType.RESIGN, auth, id);
+            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, id);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new Exception(e.getMessage());

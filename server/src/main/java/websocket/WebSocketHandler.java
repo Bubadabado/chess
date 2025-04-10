@@ -51,7 +51,7 @@ public class WebSocketHandler {
             System.out.println(game);
             var n = new LoadGameMessage(game);
             connections.broadcastOne(auth, n);
-            var notification = new NotificationMessage(message);//new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            var notification = new NotificationMessage(message);
             connections.broadcast(auth, notification, id);
         } catch (IOException | DataAccessException e) {
             var n = new ErrorMessage("Error: Unauthorized.");
@@ -164,7 +164,7 @@ public class WebSocketHandler {
             GameService.updateGame(new UpdateGameRequest(auth, id, game));
             var n = new LoadGameMessage(game);
             connections.broadcast("", n, id);
-            var notification = new NotificationMessage(String.format("%s made move: %s.", user, move));//new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            var notification = new NotificationMessage(String.format("%s made move: %s.", user, move));
             connections.broadcast(auth, notification, id);
             if(game.isInStalemate(game.getTeamTurn())) {
                 var nm = new NotificationMessage(String.format("\n%s is in stalemate! Game over.",
@@ -193,44 +193,4 @@ public class WebSocketHandler {
             connections.broadcastOne(auth, n);
         }
     }
-
-
-//    private void makeMove(String auth, Session session, int id,
-//                          String color, String user, ChessGame game, String move) throws IOException {
-//        StringBuilder msg = new StringBuilder();
-//        if(game.isGameOver()) {
-//            msg.append("Error: game is over.");
-//            connections.broadcastOne(auth,
-//                    new ServerMessage(ServerMessage.ServerMessageType.ERROR,
-//                            new Notification(msg.toString())));
-//        }
-//        else if((game.getTeamTurn() == ChessGame.TeamColor.WHITE) == (color.equalsIgnoreCase("white"))) {
-//            //checks opposite as the move will have already been made locally
-//            msg.append("Error: not your turn.");
-//            connections.broadcastOne(auth,
-//                    new ServerMessage(ServerMessage.ServerMessageType.ERROR,
-//                            new Notification(msg.toString())));
-//        } else {
-//            GameService.updateGame(new UpdateGameRequest(auth, id, game));
-//            msg.append("\n");
-//            msg.append(EscapeSequencesShared.SET_TEXT_COLOR_BLUE);
-//            msg.append(String.format("%s made move: %s.", user, move));
-//            if(game.isInStalemate(game.getTeamTurn())) {
-//                msg.append(String.format("\n%s is in stalemate! Game over.",
-//                        (game.getTeamTurn() == ChessGame.TeamColor.WHITE)
-//                                ? "White" : "Black"));
-//            } else if(game.isInCheckmate(game.getTeamTurn())) {
-//                msg.append(String.format("\n%s is in checkmate! Game over.",
-//                        (game.getTeamTurn() == ChessGame.TeamColor.WHITE)
-//                                ? "White" : "Black"));
-//            } else if(game.isInCheck(game.getTeamTurn())) {
-//                msg.append(String.format("\n%s is in check!", (game.getTeamTurn() == ChessGame.TeamColor.WHITE)
-//                        ? "White" : "Black"));
-//            }
-//            connections.broadcast("", new ServerMessage(game,
-//                    new Notification(msg.toString())), id);
-//        }
-//    }
-
-
 }

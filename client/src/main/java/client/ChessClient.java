@@ -153,7 +153,7 @@ public class ChessClient {
             }
             return result.toString();
         } catch (Exception e) {
-            return "Failed to list games.";// + e.getMessage();
+            return "Failed to list games.";
         }
     }
     public String join(String... params) {
@@ -171,7 +171,7 @@ public class ChessClient {
                 gameid = id;
                 listid = Integer.parseInt(params[0]);
                 ws = new WebSocketFacade(serverUrl, messenger);
-                ws.joinGame(user, color, authToken, id, game);
+                ws.joinGame(authToken, id);
                 return "";//"Successfully joined game \n" + printGame();
             } catch (Exception e) {
                 return "Failed to join game. Nonexistent game or color taken. Use \"list\" to view existing games";
@@ -201,10 +201,10 @@ public class ChessClient {
                 isInGame = true;
                 isObserving = true;
                 ws = new WebSocketFacade(serverUrl, messenger);
-                ws.observeGame(user, authToken, id);
+                ws.joinGame(authToken, id);
                 return "Observing game. \n" + printGame();
             } catch (Exception e) {
-                return "Failed to observe game. Invalid id. ";// + e.getMessage();
+                return "Failed to observe game. Invalid id. ";
             }
         }
         return "Observe failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
@@ -257,9 +257,8 @@ public class ChessClient {
     }
     public String leaveGame() {
         try {
-//            var response = server.leaveGame(new LeaveGameRequest(authToken, gameid));
             isInGame = false;
-            ws.leave(user, authToken, gameid, teamColor);
+            ws.leave(authToken, gameid);
             gameid = -1;
             listid = -1;
             ws = null;
@@ -270,7 +269,6 @@ public class ChessClient {
         }
     }
     public String makeMove(String... params) {
-//        if(isObserving) { return "Observers cannot make moves."; }
         int numParams = 2;
         if(params.length == numParams) {
             try {
@@ -279,12 +277,10 @@ public class ChessClient {
                 var move = new ChessMove(
                         new ChessPosition(startCoords[1], startCoords[0]),
                         new ChessPosition(endCoords[1], endCoords[0]));
-//                game.makeMove(move);
-                //params[0] + " to " + params[1]
-                ws.makeMove(user, teamColor, game, move,params[0] + " to " + params[1], authToken, gameid);
+                ws.makeMove(move,params[0] + " to " + params[1], authToken, gameid);
                 return "";
             } catch (Exception e) {
-                return "Invalid move.";// + e.getMessage();
+                return "Invalid move.";
             }
         }
         return "Make move failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
@@ -293,13 +289,13 @@ public class ChessClient {
         if(isObserving) { return "Observers cannot resign."; }
         try {
             isInGame = false;
-            ws.resign(user, authToken, gameid, game);
+            ws.resign(authToken, gameid);
             gameid = -1;
             listid = -1;
             ws = null;
             return "You resigned the game.";
         } catch (Exception e) {
-            return "Resign failed.";// + e.getMessage();
+            return "Resign failed.";
         }
     }
     public String highlight(String... params) {
@@ -310,7 +306,7 @@ public class ChessClient {
                 var moves = game.validMoves(new ChessPosition(coords[1], coords[0]));
                 return game.getBoard().toString(stringToColor(teamColor), moves);
             } catch (Exception e) {
-                return "Highlight failed. Invalid parameters given.";// + e.getMessage();
+                return "Highlight failed. Invalid parameters given.";
             }
         }
         return "Highlight failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
