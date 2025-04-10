@@ -52,7 +52,18 @@ public class UserService {
         } catch (DataAccessException e) {
             throw e;
         }
-
+    }
+    public static String getUser(String auth) throws DataAccessException {
+        var auths = new SQLAuthDAO();//MemoryAuthDAO();
+        try {
+            if(auth != null && checkAuth(auth)) {
+                return auths.getAuth(auth).username();
+            } else {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        }
     }
     private static boolean checkAuth(String authToken) throws DataAccessException {
         var auths = new SQLAuthDAO();//MemoryAuthDAO();

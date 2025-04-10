@@ -186,9 +186,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !isInCheck(teamColor) && getTeamPositions(teamColor).stream().allMatch(position -> {
+        return gameOver = (!isInCheck(teamColor) && getTeamPositions(teamColor).stream().allMatch(position -> {
             return validMoves(position, board).isEmpty();
-        });
+        }));
     }
 
     /**
