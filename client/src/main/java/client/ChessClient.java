@@ -2,6 +2,7 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import service.*;
@@ -24,6 +25,7 @@ public class ChessClient {
     private boolean isObserving;
     private String teamColor;
     private boolean isInGame;
+    private boolean checkResign;
     NotificationHandler messenger;
 
     public ChessClient(String serverUrl, NotificationHandler messenger) {
@@ -31,6 +33,7 @@ public class ChessClient {
         this.serverUrl = serverUrl;
         isLoggedIn = false;
         isInGame = false;
+        checkResign = false;
         this.messenger = messenger;
     }
 
@@ -40,7 +43,12 @@ public class ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             cmd = cmd.toLowerCase();
-            if(isInGame) {
+            if(checkResign) {
+                return switch(cmd) {
+                    case "yes" -> resign();
+                    default -> setCheckResign(false);
+                };
+            } else if(isInGame) {
                 return switch (cmd) {
                     case "redraw" -> redraw();
                     case "leave" -> leaveGame();
@@ -70,6 +78,11 @@ public class ChessClient {
         } catch (Exception ex) {
             return "Invalid input. Please try again.";//ex.getMessage();
         }
+    }
+
+    public String setCheckResign(Boolean cr) {
+        checkResign = cr;
+        return "Resign canceled.";
     }
 
     public String login(String... params) {
@@ -270,6 +283,7 @@ public class ChessClient {
     }
     public String makeMove(String... params) {
         int numParams = 2;
+        int numParams2 = 3;
         if(params.length == numParams) {
             try {
                 var startCoords = splitCoords(params[0]);
@@ -282,20 +296,67 @@ public class ChessClient {
             } catch (Exception e) {
                 return "Invalid move.";
             }
+        } else if (params.length == numParams2) {
+            try {
+                var startCoords = splitCoords(params[0]);
+                var endCoords = splitCoords(params[1]);
+                if(((teamColor.equals("white")
+                        && startCoords[1] == 7
+                        && endCoords[1] == 8)
+                    || (teamColor.equals("black")
+                        && startCoords[1] == 2
+                        && endCoords[1] == 1))
+                    && (game.getBoard().getPiece(new ChessPosition(startCoords[1], startCoords[0]))
+                        .getPieceType() == ChessPiece.PieceType.PAWN)) {
+                    ChessPiece.PieceType type;
+                    switch (params[2].toLowerCase()) {
+                        case "bishop":
+                            type = ChessPiece.PieceType.BISHOP;
+                            break;
+                        case "rook":
+                            type = ChessPiece.PieceType.ROOK;
+                            break;
+                        case "queen":
+                            type = ChessPiece.PieceType.QUEEN;
+                            break;
+                        case "knight":
+                            type = ChessPiece.PieceType.KNIGHT;
+                            break;
+                        default:
+                            return "Invalid promotion choice.";
+                    }
+                    var move = new ChessMove(
+                            new ChessPosition(startCoords[1], startCoords[0]),
+                            new ChessPosition(endCoords[1], endCoords[0]),
+                            type);
+                    ws.makeMove(move, params[0] + " to " + params[1], authToken, gameid);
+                    return "";
+                } else {
+                    return "Make move failed. Too many parameters given.";
+                }
+            } catch(Exception e) {
+                return "Invalid move.";
+            }
         }
         return "Make move failed. Too " + ((params.length < numParams) ? "few " : "many ") + "parameters given.";
     }
     public String resign() {
         if(isObserving) { return "Observers cannot resign."; }
-        try {
-            isInGame = false;
-            ws.resign(authToken, gameid);
-            gameid = -1;
-            listid = -1;
-            ws = null;
-            return "You resigned the game.";
-        } catch (Exception e) {
-            return "Resign failed.";
+        if(checkResign) {
+            try {
+                isInGame = false;
+                ws.resign(authToken, gameid);
+                gameid = -1;
+                listid = -1;
+                ws = null;
+                checkResign = false;
+                return "You resigned the game.";
+            } catch (Exception e) {
+                return "Resign failed.";
+            }
+        } else {
+            checkResign = true;
+            return "Are you sure? Enter yes or no. ";
         }
     }
     public String highlight(String... params) {
